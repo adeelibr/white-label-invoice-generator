@@ -28,3 +28,17 @@ Continue building your app on:
 2. Deploy your chats from the v0 interface
 3. Changes are automatically pushed to this repository
 4. Vercel deploys the latest version from this repository
+
+## Contributing
+
+We welcome contributions to improve the White Label Invoice Generator! Whether you want to fix bugs, add features, or improve documentation, please check out our [Contributing Guide](CONTRIBUTING.md) for detailed information on:
+
+- Development setup
+- Code style guidelines
+- Testing procedures  
+- Pull request process
+- Issue reporting
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).

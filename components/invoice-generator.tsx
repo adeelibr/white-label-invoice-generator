@@ -154,7 +154,7 @@ export function InvoiceGenerator({
 
   // Handle client selection
   useEffect(() => {
-    if (selectedClientId && selectedClientId !== "new") {
+    if (selectedClientId && selectedClientId !== "new" && selectedClientId !== "none") {
       const client = getClientById(selectedClientId)
       if (client) {
         setInvoiceData(prev => ({
@@ -319,7 +319,7 @@ export function InvoiceGenerator({
     }
 
     // For regular home page usage, save to invoice history if client is selected
-    if (selectedClientId && selectedClientId !== "new") {
+    if (selectedClientId && selectedClientId !== "new" && selectedClientId !== "none") {
       try {
         // Ensure invoice has a number
         const finalInvoiceData = {
@@ -664,7 +664,7 @@ export function InvoiceGenerator({
                         <SelectValue placeholder="Choose existing client or create new" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">No client selected</SelectItem>
+                        <SelectItem value="none">No client selected</SelectItem>
                         {allClients.map((client) => (
                           <SelectItem key={client.id} value={client.id}>
                             {client.name}
@@ -675,7 +675,7 @@ export function InvoiceGenerator({
                         </SelectItem>
                       </SelectContent>
                     </Select>
-                    {invoiceData.billTo && !selectedClientId && (
+                    {invoiceData.billTo && (!selectedClientId || selectedClientId === "none") && (
                       <Button
                         type="button"
                         variant="outline"
@@ -687,6 +687,11 @@ export function InvoiceGenerator({
                       </Button>
                     )}
                   </div>
+                  {(!selectedClientId || selectedClientId === "none") && (
+                    <p className="text-xs text-slate-500 mt-1">
+                      💡 Select a client to save this invoice to your history and manage it from the Invoices page
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -932,7 +937,12 @@ export function InvoiceGenerator({
               size="lg"
             >
               <Download className="h-5 w-5 mr-2" />
-              {onSave ? 'Save Invoice' : 'Create & Download Invoice'}
+              {onSave 
+                ? 'Save Invoice' 
+                : (selectedClientId && selectedClientId !== "none")
+                  ? 'Save Invoice & Download PDF' 
+                  : 'Create & Download Invoice'
+              }
             </Button>
           </div>
 

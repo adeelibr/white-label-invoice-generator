@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, ArrowRight, Check, X, FileText, Settings, Eye, Download } from "lucide-react"
@@ -21,17 +21,19 @@ interface WalkthroughStep {
 
 const walkthroughSteps: WalkthroughStep[] = [
   {
-    id: "form-section",
+    id: "invoice-form-section",
     title: "Fill Your Invoice Details",
     description: "Start by entering your company information, client details, and invoice items. All calculations are automatic!",
     icon: <FileText className="h-5 w-5" />,
+    highlightSelector: "#invoice-form-section",
     position: "right"
   },
   {
-    id: "preview-section", 
+    id: "invoice-preview-section", 
     title: "Real-time Preview",
     description: "Watch your invoice update instantly as you type. What you see is exactly what you'll get in the PDF.",
     icon: <Eye className="h-5 w-5" />,
+    highlightSelector: "#invoice-preview-section",
     position: "left"
   },
   {
@@ -39,6 +41,7 @@ const walkthroughSteps: WalkthroughStep[] = [
     title: "Customize Your Style",
     description: "Click here to choose from beautiful themes and templates that match your brand perfectly.",
     icon: <Settings className="h-5 w-5" />,
+    highlightSelector: "#customize-button",
     position: "bottom"
   },
   {
@@ -46,6 +49,7 @@ const walkthroughSteps: WalkthroughStep[] = [
     title: "Download Your Invoice",
     description: "When you're ready, click this button to generate and download your professional PDF invoice.",
     icon: <Download className="h-5 w-5" />,
+    highlightSelector: "#download-button",
     position: "top"
   }
 ]
@@ -53,6 +57,7 @@ const walkthroughSteps: WalkthroughStep[] = [
 export function FeatureWalkthrough({ onComplete, onSkip }: FeatureWalkthroughProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [isVisible, setIsVisible] = useState(true)
+  const [cardPosition, setCardPosition] = useState({ top: 0, left: 0 })
 
   const handleNext = () => {
     if (currentStep < walkthroughSteps.length - 1) {
@@ -80,22 +85,96 @@ export function FeatureWalkthrough({ onComplete, onSkip }: FeatureWalkthroughPro
 
   const currentStepData = walkthroughSteps[currentStep]
 
+  // Calculate position based on highlighted element
+  useEffect(() => {
+    if (currentStepData.highlightSelector) {
+      const element = document.querySelector(currentStepData.highlightSelector)
+      if (element) {
+        const rect = element.getBoundingClientRect()
+        const cardWidth = 384 // max-w-sm = 24rem = 384px
+        const cardHeight = 300 // approximate height
+        
+        let top = 0
+        let left = 0
+        
+        switch (currentStepData.position) {
+          case "top":
+            top = rect.top - cardHeight - 20
+            left = rect.left + (rect.width / 2) - (cardWidth / 2)
+            break
+          case "bottom":
+            top = rect.bottom + 20
+            left = rect.left + (rect.width / 2) - (cardWidth / 2)
+            break
+          case "left":
+            top = rect.top + (rect.height / 2) - (cardHeight / 2)
+            left = rect.left - cardWidth - 20
+            break
+          case "right":
+            top = rect.top + (rect.height / 2) - (cardHeight / 2)
+            left = rect.right + 20
+            break
+          default:
+            top = window.innerHeight / 2 - cardHeight / 2
+            left = window.innerWidth / 2 - cardWidth / 2
+        }
+        
+        // Ensure card stays within viewport
+        top = Math.max(20, Math.min(top, window.innerHeight - cardHeight - 20))
+        left = Math.max(20, Math.min(left, window.innerWidth - cardWidth - 20))
+        
+        setCardPosition({ top, left })
+      }
+    }
+  }, [currentStep, currentStepData])
+
   if (!isVisible) return null
 
   return (
     <>
-      {/* Overlay */}
-      <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300" />
+      {/* Less intrusive overlay */}
+      <div className="fixed inset-0 z-40 bg-black/20 transition-opacity duration-300" />
+      
+      {/* Element highlighting */}
+      {currentStepData.highlightSelector && (
+        <style jsx global>{`
+          ${currentStepData.highlightSelector} {
+            position: relative !important;
+            z-index: 45 !important;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.6), 0 0 30px rgba(139, 92, 246, 0.4) !important;
+            border-radius: 12px !important;
+            background-color: rgba(255, 255, 255, 0.95) !important;
+          }
+          
+          ${currentStepData.highlightSelector}::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
+            background: linear-gradient(45deg, rgba(139, 92, 246, 0.3), rgba(59, 130, 246, 0.3));
+            border-radius: 16px;
+            z-index: -1;
+            animation: pulse 2s infinite;
+          }
+          
+          @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+          }
+        `}</style>
+      )}
       
       {/* Walkthrough Card */}
-      <div className={`fixed z-50 transition-all duration-300 ${
-        currentStepData.position === "center" ? "top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" :
-        currentStepData.position === "top" ? "top-4 left-1/2 transform -translate-x-1/2" :
-        currentStepData.position === "bottom" ? "bottom-4 left-1/2 transform -translate-x-1/2" :
-        currentStepData.position === "left" ? "top-1/2 left-4 transform -translate-y-1/2" :
-        "top-1/2 right-4 transform -translate-y-1/2"
-      }`}>
-        <Card className="max-w-sm bg-white/95 backdrop-blur-sm border-0 shadow-2xl">
+      <div 
+        className="fixed z-50 transition-all duration-300"
+        style={{
+          top: cardPosition.top,
+          left: cardPosition.left,
+        }}
+      >
+        <Card className="max-w-sm bg-white/98 backdrop-blur-sm border-0 shadow-2xl">
           <CardHeader className="pb-4 relative">
             <button
               onClick={handleSkip}
@@ -181,18 +260,6 @@ export function FeatureWalkthrough({ onComplete, onSkip }: FeatureWalkthroughPro
           </CardContent>
         </Card>
       </div>
-      
-      {/* Highlight overlay for specific elements */}
-      {currentStepData.highlightSelector && (
-        <style jsx global>{`
-          ${currentStepData.highlightSelector} {
-            position: relative;
-            z-index: 45;
-            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.3), 0 0 20px rgba(139, 92, 246, 0.2);
-            border-radius: 8px;
-          }
-        `}</style>
-      )}
     </>
   )
 }

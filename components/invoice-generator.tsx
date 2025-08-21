@@ -439,6 +439,7 @@ export function InvoiceGenerator() {
               
               {/* Customize button with enhanced styling */}
               <Button
+                id="customize-button"
                 variant="outline"
                 size="sm"
                 onClick={() => setShowThemeSettings(true)}
@@ -501,7 +502,7 @@ export function InvoiceGenerator() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Invoice Form */}
-          <div className="space-y-6">
+          <div id="invoice-form-section" className="space-y-6">
             <Card className="border-0 shadow-xl bg-white/70 backdrop-blur-sm">
               <CardHeader className={`bg-gradient-to-r from- bg-transparent${themeClasses.accent}/10 to-blue-500/10 rounded-t-lg`}>
                 <CardTitle className="text-xl font-bold text-slate-800 flex items-center space-x-2">
@@ -844,6 +845,7 @@ export function InvoiceGenerator() {
             </Card>
 
             <Button
+              id="download-button"
               onClick={handleCreateInvoice}
               className={`w-full bg-gradient-to-r ${themeClasses.primary} hover:${themeClasses.primaryHover} text-white font-bold py-4 text-lg shadow-xl`}
               size="lg"
@@ -854,7 +856,7 @@ export function InvoiceGenerator() {
           </div>
 
           {/* Invoice Preview */}
-          <div className="lg:sticky lg:top-8">
+          <div id="invoice-preview-section" className="lg:sticky lg:top-8">
             <div ref={invoicePreviewRef}>
               <DynamicInvoicePreview data={invoiceData} theme={theme} template={selectedTemplate} />
             </div>

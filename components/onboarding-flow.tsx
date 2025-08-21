@@ -76,6 +76,3 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     </>
   )
 }
-
-// Re-export utility functions from storage layer for backward compatibility
-export { triggerOnboarding, resetOnboardingState, hasCompletedOnboarding } from "@/lib/storage"

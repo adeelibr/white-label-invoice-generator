@@ -21,6 +21,10 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
+import { Header } from "@/components/header"
+import { ThemeSettings, type ThemeConfig } from "@/components/theme-settings"
+import { TemplateSelection } from "@/components/template-selection"
+import { OnboardingFlow } from "@/components/onboarding-flow"
 import { 
   getAllClients, 
   saveClient, 
@@ -28,6 +32,9 @@ import {
   deleteClient, 
   searchClients, 
   getClientInvoiceCount,
+  getTheme,
+  getDefaultTheme,
+  saveTheme,
   type Client 
 } from "@/lib/storage"
 
@@ -37,6 +44,11 @@ export function ClientsDirectory() {
   const [isLoading, setIsLoading] = useState(true)
   const [showAddClient, setShowAddClient] = useState(false)
   const [editingClient, setEditingClient] = useState<Client | null>(null)
+  
+  // Theme states
+  const [theme, setTheme] = useState<ThemeConfig>(getDefaultTheme())
+  const [showThemeSettings, setShowThemeSettings] = useState(false)
+  const [showTemplateSelection, setShowTemplateSelection] = useState(false)
   
   // Form states
   const [clientForm, setClientForm] = useState({
@@ -59,6 +71,71 @@ export function ClientsDirectory() {
       setClients(getAllClients())
     }
   }, [searchQuery])
+
+  useEffect(() => {
+    const savedTheme = getTheme()
+    if (savedTheme) {
+      setTheme(savedTheme)
+    }
+  }, [])
+
+  const getThemeClasses = () => {
+    const colorSchemes = {
+      "violet-blue": {
+        primary: "from-violet-600 to-blue-600",
+        primaryHover: "from-violet-700 to-blue-700",
+        secondary: "from-violet-50 via-blue-50 to-cyan-50",
+        accent: "violet-500",
+        accentLight: "violet-50",
+        accentBorder: "violet-300",
+        accentText: "violet-600",
+      },
+      "emerald-teal": {
+        primary: "from-emerald-600 to-teal-600",
+        primaryHover: "from-emerald-700 to-teal-700",
+        secondary: "from-emerald-50 via-teal-50 to-cyan-50",
+        accent: "emerald-500",
+        accentLight: "emerald-50",
+        accentBorder: "emerald-300",
+        accentText: "emerald-600",
+      },
+      "rose-pink": {
+        primary: "from-rose-600 to-pink-600",
+        primaryHover: "from-rose-700 to-pink-700",
+        secondary: "from-rose-50 via-pink-50 to-fuchsia-50",
+        accent: "rose-500",
+        accentLight: "rose-50",
+        accentBorder: "rose-300",
+        accentText: "rose-600",
+      },
+      "orange-amber": {
+        primary: "from-orange-600 to-amber-600",
+        primaryHover: "from-orange-700 to-amber-700",
+        secondary: "from-orange-50 via-amber-50 to-yellow-50",
+        accent: "orange-500",
+        accentLight: "orange-50",
+        accentBorder: "orange-300",
+        accentText: "orange-600",
+      },
+      "indigo-purple": {
+        primary: "from-indigo-600 to-purple-600",
+        primaryHover: "from-indigo-700 to-purple-700",
+        secondary: "from-indigo-50 via-purple-50 to-violet-50",
+        accent: "indigo-500",
+        accentLight: "indigo-50",
+        accentBorder: "indigo-300",
+        accentText: "indigo-600",
+      },
+    }
+    return colorSchemes[theme.colorScheme]
+  }
+
+  const themeClasses = getThemeClasses()
+
+  const handleThemeChange = (newTheme: ThemeConfig) => {
+    setTheme(newTheme)
+    saveTheme(newTheme)
+  }
 
   const loadClients = () => {
     setIsLoading(true)
@@ -164,9 +241,20 @@ export function ClientsDirectory() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-xl border-b border-border sticky top-0 z-40">
+    <div className={`min-h-screen bg-gradient-to-br ${themeClasses.secondary}`}>
+      {/* Onboarding Flow */}
+      <OnboardingFlow />
+      
+      {/* Enhanced Header */}
+      <Header
+        theme={theme}
+        themeClasses={themeClasses}
+        onShowThemeSettings={() => setShowThemeSettings(true)}
+        onShowTemplateSelection={() => setShowTemplateSelection(true)}
+      />
+
+      {/* CRM Page Header */}
+      <div className="bg-white/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-6">
             <div className="flex items-center space-x-4">
@@ -181,7 +269,7 @@ export function ClientsDirectory() {
                 <p className="text-slate-600 mt-1">Manage your clients and their invoices</p>
               </div>
             </div>
-            <Button onClick={() => setShowAddClient(true)} className="shadow-md">
+            <Button onClick={() => setShowAddClient(true)} className={`shadow-md bg-gradient-to-r ${themeClasses.primary} hover:${themeClasses.primaryHover} text-white`}>
               <Plus className="h-4 w-4 mr-2" />
               Add Client
             </Button>
@@ -224,7 +312,11 @@ export function ClientsDirectory() {
               }
             </p>
             {!searchQuery && (
-              <Button onClick={() => setShowAddClient(true)} size="lg">
+              <Button 
+                onClick={() => setShowAddClient(true)} 
+                size="lg"
+                className={`bg-gradient-to-r ${themeClasses.primary} hover:${themeClasses.primaryHover} text-white shadow-lg`}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Your First Client
               </Button>
@@ -409,6 +501,22 @@ export function ClientsDirectory() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Theme Settings Modal */}
+      <ThemeSettings
+        isOpen={showThemeSettings}
+        onClose={() => setShowThemeSettings(false)}
+        theme={theme}
+        onThemeChange={handleThemeChange}
+      />
+
+      {/* Template Selection Modal */}
+      <TemplateSelection
+        isOpen={showTemplateSelection}
+        onClose={() => setShowTemplateSelection(false)}
+        selectedTemplate="classic"
+        onTemplateSelect={() => {}}
+      />
     </div>
   )
 }

@@ -13,37 +13,11 @@ import { Plus, Trash2, Download, Upload, X } from "lucide-react"
 import { DynamicInvoicePreview } from "./dynamic-invoice-preview"
 import { ThemeSettings, type ThemeConfig } from "./theme-settings"
 import { TemplateSelection } from "./template-selection"
-import { OnboardingFlow } from "./onboarding-flow"
+import { OnboardingFlow } from "./onboarding-flow" 
 import { Header } from "./header"
 import { HeroSection } from "./hero-section"
 import type { TemplateType } from "./templates"
-
-interface LineItem {
-  id: string
-  description: string
-  unitCost: string
-  quantity: string
-  amount: number
-}
-
-interface InvoiceData {
-  invoiceNumber: string
-  purchaseOrder: string
-  logo: string
-  companyDetails: string
-  billTo: string
-  currency: string
-  invoiceDate: string
-  dueDate: string
-  lineItems: LineItem[]
-  notes: string
-  bankDetails: string
-  subtotal: number
-  taxRate: string
-  discount: string
-  shippingFee: string
-  total: number
-}
+import { saveInvoice, getInvoice, saveTheme, getTheme, getDefaultTheme, triggerOnboarding, type InvoiceData, type LineItem } from "@/lib/storage"
 
 export function InvoiceGenerator() {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -53,10 +27,7 @@ export function InvoiceGenerator() {
   const [showTemplateSelection, setShowTemplateSelection] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>("classic")
 
-  const [theme, setTheme] = useState<ThemeConfig>({
-    colorScheme: "violet-blue",
-    fontPair: "classic",
-  })
+  const [theme, setTheme] = useState<ThemeConfig>(getDefaultTheme())
 
   const [invoiceData, setInvoiceData] = useState<InvoiceData>({
     invoiceNumber: "",
@@ -78,37 +49,28 @@ export function InvoiceGenerator() {
   })
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("invoiceGeneratorTheme")
+    const savedTheme = getTheme()
     if (savedTheme) {
-      try {
-        setTheme(JSON.parse(savedTheme))
-      } catch (error) {
-        console.error("Failed to load saved theme:", error)
-      }
+      setTheme(savedTheme)
     }
   }, [])
 
   useEffect(() => {
-    localStorage.setItem("invoiceGeneratorTheme", JSON.stringify(theme))
+    saveTheme(theme)
   }, [theme])
 
   useEffect(() => {
-    const savedData = localStorage.getItem("invoiceGeneratorData")
+    const savedData = getInvoice()
     if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData)
-        setInvoiceData(parsedData)
-        if (parsedData.logo) {
-          setLogoPreview(parsedData.logo)
-        }
-      } catch (error) {
-        console.error("Failed to load saved invoice data:", error)
+      setInvoiceData(savedData)
+      if (savedData.logo) {
+        setLogoPreview(savedData.logo)
       }
     }
   }, [])
 
   useEffect(() => {
-    localStorage.setItem("invoiceGeneratorData", JSON.stringify(invoiceData))
+    saveInvoice(invoiceData)
   }, [invoiceData])
 
   const getThemeClasses = () => {

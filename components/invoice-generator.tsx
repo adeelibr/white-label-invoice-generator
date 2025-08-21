@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Trash2, FileText, Download, Upload, X, Sparkles, Zap, Shield, Settings, Eye, HelpCircle, Star, Users } from "lucide-react"
+import { Plus, Trash2, FileText, Download, Upload, X, Sparkles, Zap, Shield, Settings, Eye, HelpCircle } from "lucide-react"
 import { DynamicInvoicePreview } from "./dynamic-invoice-preview"
 import { ThemeSettings, type ThemeConfig } from "./theme-settings"
 import { TemplateSelection } from "./template-selection"
@@ -393,21 +393,6 @@ export function InvoiceGenerator() {
         role="banner"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Top bar with social proof */}
-          <div className="hidden md:flex items-center justify-center py-2 text-xs text-slate-600 border-b border-slate-100/50">
-            <div className="flex items-center space-x-6">
-              <div className="flex items-center space-x-2">
-                <Users className="h-3 w-3 text-blue-500" />
-                <span>Trusted by 50,000+ users</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                ))}
-                <span className="ml-1">4.9/5 rating</span>
-              </div>
-            </div>
-          </div>
           
           {/* Main navigation */}
           <nav className="flex items-center justify-between py-4" aria-label="Main navigation">
@@ -434,7 +419,7 @@ export function InvoiceGenerator() {
                 variant="ghost"
                 size="sm"
                 onClick={triggerOnboarding}
-                className="text-slate-600 hover:text-slate-800 hover:bg-slate-100 transition-all duration-200"
+                className="text-slate-600 hover:text-slate-800 hover:bg-slate-100 transition-colors duration-200"
                 title="Show tour again"
               >
                 <HelpCircle className="h-4 w-4 mr-2" />
@@ -446,7 +431,7 @@ export function InvoiceGenerator() {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowTemplateSelection(true)}
-                className={`border-${themeClasses.accentBorder} text-${themeClasses.accentText} hover:bg-${themeClasses.accentLight} transition-all duration-200 hover:shadow-md hover:scale-105 font-medium`}
+                className={`border-${themeClasses.accentBorder} text-${themeClasses.accentText} hover:bg-${themeClasses.accentLight} transition-colors duration-200 font-medium`}
               >
                 <Eye className="h-4 w-4 mr-2" />
                 <span className="hidden sm:inline">Templates</span>
@@ -457,7 +442,7 @@ export function InvoiceGenerator() {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowThemeSettings(true)}
-                className={`border-${themeClasses.accentBorder} text-${themeClasses.accentText} hover:bg-${themeClasses.accentLight} transition-all duration-200 hover:shadow-md hover:scale-105 font-medium`}
+                className={`border-${themeClasses.accentBorder} text-${themeClasses.accentText} hover:bg-${themeClasses.accentLight} transition-colors duration-200 font-medium`}
                 aria-label="Customize theme and appearance"
               >
                 <Settings className="h-4 w-4 mr-2" aria-hidden="true" />

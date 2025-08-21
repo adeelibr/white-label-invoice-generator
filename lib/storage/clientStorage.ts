@@ -3,6 +3,8 @@
  * Handles localStorage operations for client data and CRM functionality
  */
 
+import type { InvoiceData } from '@/lib/storage'
+
 export interface Client {
   id: string
   name: string
@@ -27,7 +29,7 @@ export interface ClientInvoice {
   createdAt: string
   updatedAt: string
   // Full invoice data
-  invoiceData: import("@/lib/storage").InvoiceData // Will match the existing InvoiceData type
+  invoiceData: InvoiceData
 }
 
 const CLIENTS_STORAGE_KEY = "invoice-generator-clients"

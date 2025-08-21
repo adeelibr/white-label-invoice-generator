@@ -11,6 +11,7 @@ import {
   Nunito,
 } from "next/font/google"
 import "./globals.css"
+import { ModernThemeProvider } from "@/components/theme-provider"
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -160,7 +161,11 @@ export default function RootLayout({
         <meta name="theme-color" content="#7c3aed" />
         <meta name="msapplication-TileColor" content="#7c3aed" />
       </head>
-      <body className="font-sans">{children}</body>
+      <body className="font-sans">
+        <ModernThemeProvider>
+          {children}
+        </ModernThemeProvider>
+      </body>
     </html>
   )
 }

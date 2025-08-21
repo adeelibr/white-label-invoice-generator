@@ -1,4 +1,4 @@
-import { InvoiceGenerator } from "@/components/invoice-generator"
+import { ModernInvoiceGenerator } from "@/components/modern-invoice-generator"
 import { Footer } from "@/components/footer"
 import Script from "next/script"
 
@@ -53,7 +53,7 @@ export default function HomePage() {
         }}
       />
       <main className="min-h-screen bg-background">
-        <InvoiceGenerator />
+        <ModernInvoiceGenerator />
         <Footer />
       </main>
     </>

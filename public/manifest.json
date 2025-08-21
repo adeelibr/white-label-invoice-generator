@@ -1,0 +1,22 @@
+{
+  "name": "Free Invoice Generator - Create Professional Invoices Online",
+  "short_name": "Invoice Generator",
+  "description": "Create professional invoices instantly with our free online invoice generator. Perfect for small businesses and freelancers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#7c3aed",
+  "categories": ["business", "productivity", "finance"],
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/svg+xml"
+    }
+  ]
+}

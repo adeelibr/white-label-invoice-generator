@@ -1,7 +1,6 @@
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
-import { marked } from 'marked'
 
 export interface BlogPost {
   slug: string
@@ -48,10 +47,7 @@ export function getBlogPostBySlug(slug: string): BlogPost | null {
     const fileContents = fs.readFileSync(filePath, 'utf8')
     const { data, content } = matter(fileContents)
 
-    // Parse markdown content
-    const htmlContent = marked(content)
-
-    // Generate excerpt (first 150 characters of content, stripped of HTML)
+    // Generate excerpt (first 150 characters of content, stripped of markdown)
     const plainText = content.replace(/[#*`\[\]]/g, '').trim()
     const excerpt = plainText.length > 150 ? plainText.substring(0, 150) + '...' : plainText
 
@@ -63,7 +59,7 @@ export function getBlogPostBySlug(slug: string): BlogPost | null {
       readTime: data.readTime || '5 min read',
       author: data.author || 'Adeel Imran',
       keywords: data.keywords || [],
-      content: htmlContent,
+      content: content, // Return raw markdown content
       excerpt,
       image: data.image
     }

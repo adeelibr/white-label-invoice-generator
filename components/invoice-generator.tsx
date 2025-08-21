@@ -9,9 +9,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Trash2, FileText, Download, Upload, X, Sparkles, Zap, Shield, Settings } from "lucide-react"
-import { InvoicePreview } from "./invoice-preview"
+import { Plus, Trash2, FileText, Download, Upload, X, Sparkles, Zap, Shield, Settings, Eye } from "lucide-react"
+import { DynamicInvoicePreview } from "./dynamic-invoice-preview"
 import { ThemeSettings, type ThemeConfig } from "./theme-settings"
+import { TemplateSelection } from "./template-selection"
+import type { TemplateType } from "./templates"
 
 interface LineItem {
   id: string
@@ -45,6 +47,8 @@ export function InvoiceGenerator() {
   const invoicePreviewRef = useRef<HTMLDivElement>(null)
   const [logoPreview, setLogoPreview] = useState<string>("")
   const [showThemeSettings, setShowThemeSettings] = useState(false)
+  const [showTemplateSelection, setShowTemplateSelection] = useState(false)
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>("classic")
 
   const [theme, setTheme] = useState<ThemeConfig>({
     colorScheme: "violet-blue",
@@ -397,6 +401,15 @@ export function InvoiceGenerator() {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowTemplateSelection(true)}
+                className={`border-${themeClasses.accentBorder} text-${themeClasses.accentText} hover:bg-${themeClasses.accentLight}`}
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Templates
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
@@ -809,7 +822,7 @@ export function InvoiceGenerator() {
           {/* Invoice Preview */}
           <div className="lg:sticky lg:top-8">
             <div ref={invoicePreviewRef}>
-              <InvoicePreview data={invoiceData} theme={theme} />
+              <DynamicInvoicePreview data={invoiceData} theme={theme} template={selectedTemplate} />
             </div>
           </div>
         </div>
@@ -890,6 +903,13 @@ export function InvoiceGenerator() {
         onClose={() => setShowThemeSettings(false)}
         theme={theme}
         onThemeChange={setTheme}
+      />
+      
+      <TemplateSelection
+        isOpen={showTemplateSelection}
+        onClose={() => setShowTemplateSelection(false)}
+        currentTemplate={selectedTemplate}
+        onTemplateChange={setSelectedTemplate}
       />
     </div>
   )

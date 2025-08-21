@@ -386,17 +386,18 @@ export function InvoiceGenerator() {
       {/* Header */}
       <header
         className={`bg-white/80 backdrop-blur-md border-b border-${theme.colorScheme.split("-")[0]}-200/50 sticky top-0 z-50`}
+        role="banner"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
+          <nav className="flex items-center justify-between" aria-label="Main navigation">
             <div className="flex items-center space-x-3">
-              <div className={`p-2 bg-gradient-to-br ${themeClasses.primary} rounded-xl`}>
+              <div className={`p-2 bg-gradient-to-br ${themeClasses.primary} rounded-xl`} aria-hidden="true">
                 <FileText className="h-6 w-6 text-white" />
               </div>
               <h1
                 className={`text-2xl font-bold bg-gradient-to-r ${themeClasses.primary} bg-clip-text text-transparent`}
               >
-                Invoice Generator
+                Free Invoice Generator
               </h1>
             </div>
             <div className="flex items-center space-x-4">
@@ -414,44 +415,49 @@ export function InvoiceGenerator() {
                 size="sm"
                 onClick={() => setShowThemeSettings(true)}
                 className={`border-${themeClasses.accentBorder} text-${themeClasses.accentText} hover:bg-${themeClasses.accentLight}`}
+                aria-label="Customize theme and appearance"
               >
-                <Settings className="h-4 w-4 mr-2" />
+                <Settings className="h-4 w-4 mr-2" aria-hidden="true" />
                 Customize
               </Button>
               <div className="flex items-center space-x-2 text-slate-600">
-                <Shield className="h-4 w-4" />
+                <Shield className="h-4 w-4" aria-hidden="true" />
                 <span className="text-sm font-medium">Secure & Private</span>
               </div>
             </div>
-          </div>
+          </nav>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className={`relative overflow-hidden bg-gradient-to-r ${themeClasses.primary} text-white py-20`}>
-        <div className="absolute inset-0 bg-[url('/abstract-geometric-pattern.png')] opacity-10"></div>
+      <section className={`relative overflow-hidden bg-gradient-to-r ${themeClasses.primary} text-white py-20`} role="main">
+        <div className="absolute inset-0 bg-[url('/abstract-geometric-pattern.png')] opacity-10" aria-hidden="true"></div>
         <div className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center mb-6">
             <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-              <Sparkles className="h-5 w-5 text-yellow-300" />
+              <Sparkles className="h-5 w-5 text-yellow-300" aria-hidden="true" />
               <span className="text-sm font-medium">Free Forever</span>
             </div>
           </div>
           <h2 className="text-5xl font-bold mb-6 leading-tight">
-            Create Stunning Invoices
-            <span className="block text-cyan-200">In Seconds</span>
+            Create Professional Invoices
+            <span className="block text-cyan-200">Online for Free</span>
           </h2>
-          <p className="text-xl mb-4 text-blue-100">
-            Professional invoice generator with real-time preview and automatic calculations
+          <p className="text-xl mb-8 text-blue-100 max-w-3xl mx-auto">
+            The best free online invoice generator for small businesses and freelancers. Create, customize, and download professional invoices in minutes with automatic calculations and beautiful themes.
           </p>
-          <div className="flex justify-center items-center space-x-6 text-sm">
+          <div className="flex flex-wrap justify-center items-center gap-6 text-sm mb-8">
             <div className="flex items-center space-x-2">
-              <Zap className="h-4 w-4 text-yellow-300" />
+              <Zap className="h-4 w-4 text-yellow-300" aria-hidden="true" />
               <span>Instant PDF Download</span>
             </div>
             <div className="flex items-center space-x-2">
-              <Shield className="h-4 w-4 text-green-300" />
-              <span>Data Saved Locally</span>
+              <Shield className="h-4 w-4 text-green-300" aria-hidden="true" />
+              <span>Privacy Protected</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <FileText className="h-4 w-4 text-blue-300" aria-hidden="true" />
+              <span>No Registration Required</span>
             </div>
           </div>
         </div>
@@ -823,74 +829,71 @@ export function InvoiceGenerator() {
       </div>
 
       {/* How to Section */}
-      <section className="bg-gradient-to-br from-slate-50 to-blue-50 py-20">
+      <section className="bg-gradient-to-br from-slate-50 to-blue-50 py-20" aria-labelledby="how-to-heading">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h3 className="text-4xl font-bold bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-transparent mb-4">
-              How to create an invoice online
+          <header className="text-center mb-16">
+            <h3 id="how-to-heading" className="text-4xl font-bold bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-transparent mb-4">
+              How to Create Professional Invoices Online in 4 Simple Steps
             </h3>
-            <p className="text-xl text-slate-600">Follow these simple steps to create professional invoices</p>
-          </div>
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+              Our free invoice generator makes it easy to create professional invoices for your small business or freelance work. No signup required - start generating invoices immediately.
+            </p>
+          </header>
 
-          <div className="space-y-12">
-            <div className="flex items-start space-x-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-violet-500 to-blue-500 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-lg">
+          <div className="space-y-12" role="list">
+            <article className="flex items-start space-x-6" role="listitem">
+              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-violet-500 to-blue-500 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-lg" aria-hidden="true">
                 1
               </div>
               <div>
                 <h4 className="text-2xl font-bold mb-3 text-slate-800">
-                  Fill in your company and contact information, date and invoice number.
+                  Add Your Business Information and Invoice Details
                 </h4>
                 <p className="text-slate-600 text-lg leading-relaxed">
-                  Create a professional first impression and make it easy for your client to see all your company and
-                  contact details. Using sequential invoice numbers also makes it easier to track and reconcile
-                  paperwork and payments.
+                  Start by entering your business name, address, and contact information. Add your company logo to create a professional branded invoice. Include the invoice number, date, and due date to establish clear payment terms with your clients.
                 </p>
               </div>
-            </div>
+            </article>
 
-            <div className="flex items-start space-x-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-lg">
+            <article className="flex items-start space-x-6" role="listitem">
+              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-lg" aria-hidden="true">
                 2
               </div>
               <div>
                 <h4 className="text-2xl font-bold mb-3 text-slate-800">
-                  Include line items with descriptions of billable work, and agreed rates.
+                  Add Line Items with Product or Service Details
                 </h4>
                 <p className="text-slate-600 text-lg leading-relaxed">
-                  Enter all the details of the work you're invoicing. Add line by line details of billable work,
-                  including a clear description, price or hourly rate, and quantity.
+                  List each product or service you're billing for. Include detailed descriptions, quantities, unit prices, and rates. Our invoice maker automatically calculates line totals, making it perfect for hourly billing, project-based work, or product sales.
                 </p>
               </div>
-            </div>
+            </article>
 
-            <div className="flex items-start space-x-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-cyan-500 to-violet-500 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-lg">
+            <article className="flex items-start space-x-6" role="listitem">
+              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-cyan-500 to-violet-500 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-lg" aria-hidden="true">
                 3
               </div>
               <div>
                 <h4 className="text-2xl font-bold mb-3 text-slate-800">
-                  Add tax and calculate the amount due, noting payment terms.
+                  Configure Tax Rates, Discounts, and Payment Terms
                 </h4>
                 <p className="text-slate-600 text-lg leading-relaxed">
-                  Include client as your invoice recipient. Important payment details like the company and requested
-                  payment timeline. Make sure you've included all your bank details so your customer can settle up.
+                  Set up tax calculations, apply discounts, and add shipping fees as needed. Include your bank details and payment terms to make it easy for clients to pay. Our calculator automatically computes the final total amount due.
                 </p>
               </div>
-            </div>
+            </article>
 
-            <div className="flex items-start space-x-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-violet-500 to-blue-500 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-lg">
+            <article className="flex items-start space-x-6" role="listitem">
+              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-violet-500 to-blue-500 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-lg" aria-hidden="true">
                 4
               </div>
               <div>
-                <h4 className="text-2xl font-bold mb-3 text-slate-800">Download your invoice as PDF.</h4>
+                <h4 className="text-2xl font-bold mb-3 text-slate-800">Download Your Professional Invoice as PDF</h4>
                 <p className="text-slate-600 text-lg leading-relaxed">
-                  You're ready to download your completed document as a professional-looking PDF, adding password
-                  protection if you want. Send it to your client via email or post banking.
+                  Preview your completed invoice and download it as a high-quality PDF file. Your professional invoice is ready to send to clients via email or print for physical delivery. All data stays private in your browser - no account required.
                 </p>
               </div>
-            </div>
+            </article>
           </div>
         </div>
       </section>

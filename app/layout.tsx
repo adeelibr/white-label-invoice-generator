@@ -69,10 +69,76 @@ const nunito = Nunito({
 })
 
 export const metadata: Metadata = {
-  title: "Invoice Generator - Create Professional Invoices",
-  description:
-    "Free online invoice generator for small businesses and freelancers. Create professional invoices in minutes.",
-  generator: "Invoice Generator",
+  metadataBase: new URL('https://white-label-invoice-generator.vercel.app'),
+  title: {
+    default: "Free Invoice Generator - Create Professional Invoices Online",
+    template: "%s | Free Invoice Generator"
+  },
+  description: "Free online invoice generator for small businesses and freelancers. Create professional invoices with customizable themes, automatic calculations, and instant PDF download. No registration required.",
+  keywords: [
+    "free invoice generator",
+    "online invoice creator",
+    "professional invoices",
+    "small business invoicing",
+    "freelancer invoice tool",
+    "PDF invoice maker",
+    "invoice template",
+    "business invoice generator",
+    "custom invoice creator",
+    "invoice maker online"
+  ],
+  authors: [{ name: "Adeel Imran", url: "https://twitter.com/adeelibr" }],
+  creator: "Adeel Imran",
+  publisher: "Binary Code Barn",
+  generator: "Next.js",
+  applicationName: "Free Invoice Generator",
+  referrer: "origin-when-cross-origin",
+  category: "Business Tools",
+  classification: "Invoice Generator",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    title: "Free Invoice Generator - Create Professional Invoices Online",
+    description: "Create professional invoices instantly with our free online invoice generator. Perfect for small businesses and freelancers. No registration required - download PDF invoices immediately.",
+    siteName: "Free Invoice Generator",
+    images: [
+      {
+        url: "/og-image.svg",
+        width: 1200,
+        height: 630,
+        alt: "Free Invoice Generator - Create Professional Invoices Online",
+        type: "image/svg+xml",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@adeelibr",
+    creator: "@adeelibr",
+    title: "Free Invoice Generator - Create Professional Invoices Online",
+    description: "Create professional invoices instantly with our free online invoice generator. Perfect for small businesses and freelancers.",
+    images: ["/og-image.svg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "verification_token_here", // Replace with actual Google Search Console verification token when available
+  },
+  alternates: {
+    canonical: "/",
+  },
 }
 
 export default function RootLayout({
@@ -85,6 +151,15 @@ export default function RootLayout({
       lang="en"
       className={`${playfair.variable} ${sourceSans.variable} ${inter.variable} ${openSans.variable} ${crimsonText.variable} ${spaceGrotesk.variable} ${poppins.variable} ${nunito.variable} antialiased`}
     >
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="format-detection" content="telephone=no" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#7c3aed" />
+        <meta name="msapplication-TileColor" content="#7c3aed" />
+      </head>
       <body className="font-sans">{children}</body>
     </html>
   )

@@ -74,28 +74,30 @@ export function Header({
               <span className="hidden sm:inline">Tour</span>
             </Button>
             
-            {/* Templates button with enhanced styling */}
+            {/* Templates button with enhanced modern styling */}
             <Button
               variant="outline"
               size="sm"
               onClick={onShowTemplateSelection}
-              className={`border-${themeClasses.accentBorder} text-${themeClasses.accentText} hover:bg-${themeClasses.accentLight} transition-colors duration-200 font-medium`}
+              className="group relative bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 text-blue-700 hover:from-blue-100 hover:to-indigo-100 hover:border-blue-300 hover:text-blue-800 transition-all duration-300 font-medium shadow-sm hover:shadow-md active:scale-95"
             >
-              <Eye className="h-4 w-4 mr-2" />
+              <Eye className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform duration-200" />
               <span className="hidden sm:inline">Templates</span>
+              <div className="absolute inset-0 rounded-md bg-gradient-to-r from-blue-400/0 to-indigo-400/0 group-hover:from-blue-400/5 group-hover:to-indigo-400/5 transition-all duration-300" />
             </Button>
             
-            {/* Customize button with enhanced styling */}
+            {/* Customize button with enhanced modern styling */}
             <Button
               id="customize-button"
               variant="outline"
               size="sm"
               onClick={onShowThemeSettings}
-              className={`border-${themeClasses.accentBorder} text-${themeClasses.accentText} hover:bg-${themeClasses.accentLight} transition-colors duration-200 font-medium`}
+              className="group relative bg-gradient-to-r from-violet-50 to-purple-50 border-violet-200 text-violet-700 hover:from-violet-100 hover:to-purple-100 hover:border-violet-300 hover:text-violet-800 transition-all duration-300 font-medium shadow-sm hover:shadow-md active:scale-95"
               aria-label="Customize theme and appearance"
             >
-              <Settings className="h-4 w-4 mr-2" aria-hidden="true" />
+              <Settings className="h-4 w-4 mr-2 group-hover:rotate-90 transition-transform duration-300" aria-hidden="true" />
               <span className="hidden sm:inline">Customize</span>
+              <div className="absolute inset-0 rounded-md bg-gradient-to-r from-violet-400/0 to-purple-400/0 group-hover:from-violet-400/5 group-hover:to-purple-400/5 transition-all duration-300" />
             </Button>
             
             {/* Enhanced security badge */}

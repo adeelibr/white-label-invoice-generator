@@ -60,36 +60,44 @@ export function TemplateSelection({ isOpen, onClose, currentTemplate, onTemplate
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-4xl max-h-[90vh] border-0 shadow-2xl flex flex-col overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex-shrink-0">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-5xl max-h-[90vh] border-0 shadow-2xl flex flex-col overflow-hidden bg-white/95 backdrop-blur-sm">
+        <CardHeader className="bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-purple-500/10 flex-shrink-0 border-b border-blue-100/50">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl font-bold text-slate-800 flex items-center space-x-2">
-              <Eye className="h-5 w-5" />
+            <CardTitle className="text-2xl font-bold text-slate-800 flex items-center space-x-3">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 text-white shadow-lg">
+                <Eye className="h-6 w-6" />
+              </div>
               <span>Choose Invoice Template</span>
             </CardTitle>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-4 w-4" />
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onClose}
+              className="hover:bg-blue-100 transition-colors duration-200 rounded-full p-2"
+            >
+              <X className="h-5 w-5" />
             </Button>
           </div>
+          <p className="text-slate-600 mt-2 text-sm">Select a professional template that matches your business style</p>
         </CardHeader>
         
-        <CardContent className="flex-1 overflow-y-auto p-6">
+        <CardContent className="flex-1 overflow-y-auto p-8 bg-gradient-to-br from-slate-50/30 to-white">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Object.values(templateConfigs).map((template) => (
               <div
                 key={template.id}
-                className={`p-4 rounded-lg border-2 cursor-pointer transition-all hover:shadow-lg ${
+                className={`group p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${
                   currentTemplate === template.id
-                    ? "border-blue-500 bg-blue-50 shadow-md"
-                    : "border-slate-200 hover:border-slate-300 bg-white"
+                    ? "border-blue-500 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 shadow-lg ring-2 ring-blue-200"
+                    : "border-slate-200 hover:border-blue-300 bg-white hover:bg-gradient-to-br hover:from-blue-50/30 hover:via-indigo-50/30 hover:to-purple-50/30"
                 }`}
                 onClick={() => onTemplateChange(template.id)}
               >
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {/* Template Preview Mockup */}
-                  <div className="relative h-32 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg overflow-hidden">
-                    <div className="absolute inset-2 bg-white rounded shadow-sm">
+                  <div className="relative h-40 bg-gradient-to-br from-slate-100 via-slate-50 to-white rounded-xl overflow-hidden border-2 border-slate-200/50 group-hover:border-blue-200">
+                    <div className="absolute inset-3 bg-white rounded-lg shadow-lg transition-all duration-300 group-hover:shadow-xl">
                       {/* Different visual patterns for each template */}
                       {template.id === "classic" && (
                         <div className="p-2 space-y-1">
@@ -182,29 +190,61 @@ export function TemplateSelection({ isOpen, onClose, currentTemplate, onTemplate
                   </div>
                   
                   {/* Template Info */}
-                  <div>
-                    <h3 className="font-semibold text-slate-800 mb-1">{template.name}</h3>
-                    <p className="text-sm text-slate-600 mb-2">{template.description}</p>
-                    <p className="text-xs text-slate-500 italic">{template.preview}</p>
-                  </div>
-                  
-                  {/* Selection Indicator */}
-                  {currentTemplate === template.id && (
-                    <div className="flex items-center justify-center">
-                      <div className="bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-                        Currently Selected
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-slate-800 mb-2 flex items-center space-x-2">
+                          <span>{template.name}</span>
+                          {currentTemplate === template.id && (
+                            <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-2 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1">
+                              <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                              <span>Active</span>
+                            </span>
+                          )}
+                        </h3>
+                        <p className="text-sm text-slate-600 mb-3 leading-relaxed">{template.description}</p>
+                        <div className="flex items-center space-x-2 text-xs text-slate-500">
+                          <div className="flex items-center space-x-1">
+                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                            <span>Professional</span>
+                          </div>
+                          <div className="w-1 h-1 bg-slate-300 rounded-full"></div>
+                          <span className="italic">{template.preview}</span>
+                        </div>
                       </div>
                     </div>
-                  )}
+                    
+                    {/* Action Button */}
+                    <div className="pt-2 border-t border-slate-100">
+                      <div className={`text-center text-sm font-medium transition-all duration-200 ${
+                        currentTemplate === template.id 
+                          ? "text-blue-600" 
+                          : "text-slate-500 group-hover:text-blue-600"
+                      }`}>
+                        {currentTemplate === template.id ? "✓ Currently Selected" : "Click to Select"}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
           
-          <div className="mt-8 text-center">
-            <Button onClick={onClose} size="lg" className="px-8">
-              Apply Template
-            </Button>
+          <div className="mt-10 p-6 bg-gradient-to-r from-slate-50 to-slate-100 rounded-2xl border border-slate-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-semibold text-slate-800 mb-1">Ready to apply your template?</h4>
+                <p className="text-sm text-slate-600">Your invoice will update instantly with the new design</p>
+              </div>
+              <Button 
+                onClick={onClose} 
+                size="lg" 
+                className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-200 px-8 py-3"
+              >
+                <span>Apply Template</span>
+                <div className="ml-2 w-2 h-2 bg-white/30 rounded-full animate-pulse"></div>
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

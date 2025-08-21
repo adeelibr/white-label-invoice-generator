@@ -46,7 +46,7 @@ export function InvoiceGenerator({
   
   // Client management state
   const [allClients, setAllClients] = useState<Client[]>([])
-  const [selectedClientId, setSelectedClientId] = useState<string>("")
+  const [selectedClientId, setSelectedClientId] = useState<string>("none")
   const [showClientDialog, setShowClientDialog] = useState(false)
   const [clientDialogInitialData, setClientDialogInitialData] = useState<Partial<{ name: string; email: string; address: string }> | undefined>()
 

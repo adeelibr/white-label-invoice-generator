@@ -63,8 +63,6 @@ export function TemplateSelection({ isOpen, onClose, currentTemplate, onTemplate
       title="Choose Invoice Template"
       subtitle="Select a professional template that matches your business style"
       icon={<Eye className="h-6 w-6" />}
-      applyButtonText="Apply Template"
-      footerMessage="Your invoice will update instantly with the new design"
       maxWidth="max-w-5xl"
       headerGradient="from-blue-500/10 via-indigo-500/10 to-purple-500/10"
     >

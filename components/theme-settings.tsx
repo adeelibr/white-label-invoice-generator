@@ -94,8 +94,6 @@ export function ThemeSettings({ isOpen, onClose, theme, onThemeChange }: ThemeSe
       title="Theme Customization"
       subtitle="Personalize your invoice design with beautiful color schemes and typography"
       icon={<Settings className="h-6 w-6" />}
-      applyButtonText="Apply Theme"
-      footerMessage="Preview changes in real-time on your invoice"
     >
       <div className="space-y-8">
         {/* Color Schemes */}

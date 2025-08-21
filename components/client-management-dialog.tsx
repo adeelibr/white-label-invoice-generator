@@ -30,6 +30,7 @@ interface ClientManagementDialogProps {
   onClientDeleted?: (clientId: string) => void
   editingClient?: Client | null
   mode: 'add' | 'edit'
+  initialData?: Partial<ClientFormData>
 }
 
 export function ClientManagementDialog({
@@ -38,7 +39,8 @@ export function ClientManagementDialog({
   onClientSaved,
   onClientDeleted,
   editingClient,
-  mode
+  mode,
+  initialData
 }: ClientManagementDialogProps) {
   const [formData, setFormData] = useState<ClientFormData>({
     name: "",
@@ -64,18 +66,19 @@ export function ClientManagementDialog({
           website: editingClient.website || ""
         })
       } else {
+        // Use initial data if provided, otherwise empty form
         setFormData({
-          name: "",
-          email: "",
-          address: "",
-          phone: "",
-          website: ""
+          name: initialData?.name || "",
+          email: initialData?.email || "",
+          address: initialData?.address || "",
+          phone: initialData?.phone || "",
+          website: initialData?.website || ""
         })
       }
       setError("")
       setShowDeleteConfirm(false)
     }
-  }, [isOpen, editingClient, mode])
+  }, [isOpen, editingClient, mode, initialData])
 
   const validateForm = (): boolean => {
     if (!formData.name.trim()) {

@@ -9,15 +9,16 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Trash2, Download, Upload, X } from "lucide-react"
+import { Plus, Trash2, Download, Upload, X, Users } from "lucide-react"
 import { DynamicInvoicePreview } from "./dynamic-invoice-preview"
 import { ThemeSettings, type ThemeConfig } from "./theme-settings"
 import { TemplateSelection } from "./template-selection"
 import { OnboardingFlow } from "./onboarding-flow" 
 import { Header } from "./header"
 import { HeroSection } from "./hero-section"
+import { ClientManagementDialog } from "./client-management-dialog"
 import type { TemplateType } from "./templates"
-import { saveInvoice, getInvoice, saveTheme, getTheme, getDefaultTheme, triggerOnboarding, getClientById, getNextInvoiceNumber, type InvoiceData, type LineItem, type Client, type InvoiceHistoryItem } from "@/lib/storage"
+import { saveInvoice, getInvoice, saveTheme, getTheme, getDefaultTheme, triggerOnboarding, getClientById, getNextInvoiceNumber, getAllClients, addInvoiceToHistory, type InvoiceData, type LineItem, type Client, type InvoiceHistoryItem } from "@/lib/storage"
 
 export interface InvoiceGeneratorProps {
   initialData?: InvoiceHistoryItem
@@ -42,6 +43,12 @@ export function InvoiceGenerator({
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>("classic")
 
   const [theme, setTheme] = useState<ThemeConfig>(getDefaultTheme())
+  
+  // Client management state
+  const [allClients, setAllClients] = useState<Client[]>([])
+  const [selectedClientId, setSelectedClientId] = useState<string>("")
+  const [showClientDialog, setShowClientDialog] = useState(false)
+  const [clientDialogInitialData, setClientDialogInitialData] = useState<Partial<{ name: string; email: string; address: string }> | undefined>()
 
   const [invoiceData, setInvoiceData] = useState<InvoiceData>({
     invoiceNumber: "",
@@ -138,6 +145,25 @@ export function InvoiceGenerator({
       saveInvoice(invoiceData)
     }
   }, [invoiceData, onSave])
+
+  // Load clients
+  useEffect(() => {
+    const clients = getAllClients()
+    setAllClients(clients)
+  }, [])
+
+  // Handle client selection
+  useEffect(() => {
+    if (selectedClientId && selectedClientId !== "new") {
+      const client = getClientById(selectedClientId)
+      if (client) {
+        setInvoiceData(prev => ({
+          ...prev,
+          billTo: `${client.name}\n${client.address}${client.phone ? `\nPhone: ${client.phone}` : ''}${client.email ? `\nEmail: ${client.email}` : ''}`
+        }))
+      }
+    }
+  }, [selectedClientId])
 
   const getThemeClasses = () => {
     const colorSchemes = {
@@ -292,6 +318,29 @@ export function InvoiceGenerator({
       return
     }
 
+    // For regular home page usage, save to invoice history if client is selected
+    if (selectedClientId && selectedClientId !== "new") {
+      try {
+        // Ensure invoice has a number
+        const finalInvoiceData = {
+          ...invoiceData,
+          invoiceNumber: invoiceData.invoiceNumber || getNextInvoiceNumber(selectedClientId)
+        }
+        
+        // Add to invoice history
+        addInvoiceToHistory(finalInvoiceData, selectedClientId, 'sent')
+        
+        // Update local state
+        setInvoiceData(finalInvoiceData)
+        
+        alert("Invoice saved successfully! You can view it in the Invoices page.")
+      } catch (error) {
+        console.error("Failed to save invoice:", error)
+        alert("Failed to save invoice. Please try again.")
+        return
+      }
+    }
+
     if (!invoicePreviewRef.current) {
       console.error("Invoice preview not found")
       return
@@ -415,6 +464,58 @@ export function InvoiceGenerator({
     } catch (error) {
       console.error("Error generating PDF:", error)
       alert("Error generating PDF. Please try again.")
+    }
+  }
+
+  // Client management handlers
+  const handleClientSelect = (clientId: string) => {
+    setSelectedClientId(clientId)
+    if (clientId === "new") {
+      setClientDialogInitialData(undefined)
+      setShowClientDialog(true)
+    }
+  }
+
+  const handleClientSaved = (client: Client) => {
+    // Refresh client list
+    const updatedClients = getAllClients()
+    setAllClients(updatedClients)
+    
+    // Select the newly created client
+    setSelectedClientId(client.id)
+    setShowClientDialog(false)
+    setClientDialogInitialData(undefined)
+  }
+
+  const extractClientFromBillTo = (): { name: string; email: string; address: string } | null => {
+    const billTo = invoiceData.billTo.trim()
+    if (!billTo) return null
+    
+    const lines = billTo.split('\n')
+    const name = lines[0]?.trim() || ""
+    
+    // Look for email pattern
+    const emailMatch = billTo.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/)
+    const email = emailMatch ? emailMatch[0] : ""
+    
+    // Remove email and phone from address
+    let address = billTo
+    if (email) {
+      address = address.replace(/Email:\s*[^\n]+/gi, '')
+    }
+    address = address.replace(/Phone:\s*[^\n]+/gi, '')
+    address = address.replace(/\n+/g, '\n').trim()
+    
+    return { name, email, address }
+  }
+
+  const handleCreateClientFromBillTo = () => {
+    const clientData = extractClientFromBillTo()
+    if (clientData && clientData.name) {
+      setClientDialogInitialData(clientData)
+      setShowClientDialog(true)
+    } else {
+      alert("Please enter client information in the 'Bill to' field first")
     }
   }
 
@@ -544,6 +645,48 @@ export function InvoiceGenerator({
                     rows={4}
                     className={`border-slate-200 focus:border-${themeClasses.accentText.split("-")[0]}-400 focus:ring-${themeClasses.accentText.split("-")[0]}-400`}
                   />
+                </div>
+
+                {/* Client Selection Section */}
+                <div>
+                  <Label htmlFor="clientSelect" className="text-slate-700 font-medium flex items-center">
+                    <Users className="h-4 w-4 mr-2" />
+                    Select Client (Optional)
+                  </Label>
+                  <div className="flex gap-2 mt-1">
+                    <Select
+                      value={selectedClientId}
+                      onValueChange={handleClientSelect}
+                    >
+                      <SelectTrigger
+                        className={`border-slate-200 focus:border-${themeClasses.accentText.split("-")[0]}-400 focus:ring-${themeClasses.accentText.split("-")[0]}-400`}
+                      >
+                        <SelectValue placeholder="Choose existing client or create new" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">No client selected</SelectItem>
+                        {allClients.map((client) => (
+                          <SelectItem key={client.id} value={client.id}>
+                            {client.name}
+                          </SelectItem>
+                        ))}
+                        <SelectItem value="new" className="text-blue-600 font-medium">
+                          + Create New Client
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {invoiceData.billTo && !selectedClientId && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleCreateClientFromBillTo}
+                        className="whitespace-nowrap"
+                      >
+                        Create from Bill To
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 <div>
@@ -884,6 +1027,19 @@ export function InvoiceGenerator({
         onClose={() => setShowTemplateSelection(false)}
         currentTemplate={selectedTemplate}
         onTemplateChange={setSelectedTemplate}
+      />
+
+      {/* Client Management Dialog */}
+      <ClientManagementDialog
+        isOpen={showClientDialog}
+        onClose={() => {
+          setShowClientDialog(false)
+          setClientDialogInitialData(undefined)
+        }}
+        mode="add"
+        editingClient={null}
+        onClientSaved={handleClientSaved}
+        initialData={clientDialogInitialData}
       />
     </div>
   )

@@ -93,42 +93,46 @@ export default function BlogPage() {
           ) : (
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {posts.map((post) => (
-                <Card key={post.slug} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                      <Calendar className="w-4 h-4" />
-                      <span>{new Date(post.date).toLocaleDateString()}</span>
-                      <Clock className="w-4 h-4 ml-2" />
-                      <span>{post.readTime}</span>
+                <Card key={post.slug} className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group border-0 shadow-md bg-gradient-to-br from-background to-muted/20">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-primary" />
+                        <span className="font-medium">{new Date(post.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-primary" />
+                        <span className="font-medium">{post.readTime}</span>
+                      </div>
                     </div>
                     
-                    <CardTitle className="hover:text-primary transition-colors">
-                      <Link href={`/blog/${post.slug}`}>
+                    <CardTitle className="group-hover:text-primary transition-colors leading-tight text-xl">
+                      <Link href={`/blog/${post.slug}`} className="line-clamp-3">
                         {post.title}
                       </Link>
                     </CardTitle>
                     
-                    <CardDescription>
+                    <CardDescription className="text-muted-foreground leading-relaxed">
                       {post.description}
                     </CardDescription>
                   </CardHeader>
                   
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4">
+                  <CardContent className="pt-0">
+                    <p className="text-sm text-muted-foreground mb-6 leading-relaxed line-clamp-3">
                       {post.excerpt}
                     </p>
                     
-                    <div className="flex flex-wrap gap-2 mb-4">
+                    <div className="flex flex-wrap gap-2 mb-6">
                       {post.keywords.slice(0, 3).map((keyword) => (
-                        <Badge key={keyword} variant="secondary" className="text-xs">
+                        <Badge key={keyword} variant="secondary" className="text-xs px-2 py-1 bg-primary/10 text-primary border-0">
                           {keyword}
                         </Badge>
                       ))}
                     </div>
                     
                     <Link href={`/blog/${post.slug}`}>
-                      <Button variant="outline" size="sm" className="w-full">
-                        Read More
+                      <Button variant="outline" size="sm" className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
+                        Read Article →
                       </Button>
                     </Link>
                   </CardContent>

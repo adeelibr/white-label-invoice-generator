@@ -109,38 +109,44 @@ export default function BlogPost({ params }: Props) {
         {/* Article */}
         <article className="container max-w-4xl mx-auto px-4 py-12">
           {/* Article Header */}
-          <header className="mb-12">
-            <div className="flex flex-wrap gap-2 mb-4">
+          <header className="mb-16">
+            <div className="flex flex-wrap gap-2 mb-6">
               {post.keywords.slice(0, 5).map((keyword) => (
-                <Badge key={keyword} variant="secondary">
+                <Badge key={keyword} variant="secondary" className="text-xs px-3 py-1">
                   {keyword}
                 </Badge>
               ))}
             </div>
             
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-8 leading-tight">
               {post.title}
             </h1>
             
-            <p className="text-xl text-muted-foreground mb-6 leading-relaxed">
+            <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed font-light max-w-3xl">
               {post.description}
             </p>
             
-            <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <User className="w-4 h-4" />
-                <span>{post.author}</span>
+            <div className="flex flex-wrap items-center gap-8 text-sm text-muted-foreground border-t border-muted pt-6">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                  <User className="w-4 h-4 text-primary" />
+                </div>
+                <span className="font-medium">{post.author}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Calendar className="w-4 h-4 text-primary" />
+                </div>
                 <span>{new Date(post.date).toLocaleDateString('en-US', { 
                   year: 'numeric', 
                   month: 'long', 
                   day: 'numeric' 
                 })}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4" />
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-primary" />
+                </div>
                 <span>{post.readTime}</span>
               </div>
             </div>
@@ -148,27 +154,41 @@ export default function BlogPost({ params }: Props) {
 
           {/* Article Content */}
           <div 
-            className="prose prose-gray dark:prose-invert max-w-none prose-lg
-                       prose-headings:font-bold prose-headings:tracking-tight
-                       prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl
-                       prose-p:leading-relaxed prose-li:leading-relaxed
-                       prose-a:text-primary hover:prose-a:text-primary/80
-                       prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded
-                       prose-pre:bg-muted prose-pre:border
-                       prose-blockquote:border-l-primary prose-blockquote:border-l-4
-                       prose-img:rounded-lg prose-img:shadow-md"
+            className="prose prose-gray dark:prose-invert max-w-none prose-xl
+                       prose-headings:font-bold prose-headings:tracking-tight prose-headings:scroll-mt-20
+                       prose-h1:text-4xl prose-h1:mb-8 prose-h1:mt-12 prose-h1:leading-tight
+                       prose-h2:text-3xl prose-h2:mb-6 prose-h2:mt-12 prose-h2:border-b prose-h2:border-muted prose-h2:pb-3
+                       prose-h3:text-2xl prose-h3:mb-4 prose-h3:mt-8 prose-h3:text-primary
+                       prose-h4:text-xl prose-h4:mb-3 prose-h4:mt-6 prose-h4:font-semibold
+                       prose-p:leading-relaxed prose-p:mb-6 prose-p:text-muted-foreground prose-p:text-[17px]
+                       prose-li:leading-relaxed prose-li:mb-2 prose-li:text-muted-foreground
+                       prose-ul:mb-6 prose-ul:pl-6 prose-ol:mb-6 prose-ol:pl-6
+                       prose-li:marker:text-primary prose-li:pl-2
+                       prose-a:text-primary prose-a:font-medium prose-a:no-underline 
+                       hover:prose-a:text-primary/80 hover:prose-a:underline
+                       prose-strong:text-foreground prose-strong:font-semibold
+                       prose-code:bg-muted prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm
+                       prose-pre:bg-muted prose-pre:border prose-pre:rounded-lg prose-pre:p-4
+                       prose-blockquote:border-l-primary prose-blockquote:border-l-4 prose-blockquote:pl-6 
+                       prose-blockquote:my-6 prose-blockquote:italic prose-blockquote:text-muted-foreground
+                       prose-img:rounded-lg prose-img:shadow-lg prose-img:border prose-img:my-8
+                       prose-hr:border-muted prose-hr:my-12
+                       first:prose-p:mt-0 last:prose-p:mb-0"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
 
           {/* Call to Action */}
-          <div className="mt-16 p-8 bg-muted rounded-lg text-center">
-            <h3 className="text-2xl font-bold mb-4">Ready to Create Professional Invoices?</h3>
-            <p className="text-muted-foreground mb-6">
-              Use our free invoice generator to create beautiful, professional invoices in minutes.
+          <div className="mt-20 p-8 md:p-12 bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 rounded-2xl border border-primary/20 text-center">
+            <h3 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              Ready to Create Professional Invoices?
+            </h3>
+            <p className="text-muted-foreground mb-8 text-lg leading-relaxed max-w-2xl mx-auto">
+              Use our free invoice generator to create beautiful, professional invoices in minutes. 
+              No registration required, completely free forever.
             </p>
             <Link href="/">
-              <Button size="lg">
-                Start Creating Invoices
+              <Button size="lg" className="px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200">
+                Start Creating Invoices →
               </Button>
             </Link>
           </div>

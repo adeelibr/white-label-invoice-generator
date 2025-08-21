@@ -1,0 +1,32 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+  
+  <!-- Main Content -->
+  <text x="600" y="200" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="72" font-weight="bold">
+    Free Invoice Generator
+  </text>
+  
+  <text x="600" y="280" text-anchor="middle" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="36">
+    Create Professional Invoices Online
+  </text>
+  
+  <text x="600" y="360" text-anchor="middle" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="28">
+    • No Registration Required • Instant PDF Download • Multi-Currency Support
+  </text>
+  
+  <!-- Features -->
+  <text x="600" y="450" text-anchor="middle" fill="#f1f5f9" font-family="Arial, sans-serif" font-size="24" font-weight="500">
+    Perfect for Small Businesses & Freelancers
+  </text>
+  
+  <!-- Logo placeholder -->
+  <rect x="550" y="490" width="100" height="80" rx="10" fill="rgba(255,255,255,0.2)"/>
+  <text x="600" y="540" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="20">📄</text>
+</svg>

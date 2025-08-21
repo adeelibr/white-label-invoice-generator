@@ -3,6 +3,12 @@
 import React, { useState, useEffect } from "react"
 import { WelcomeScreen } from "./welcome-screen"
 import { FeatureWalkthrough } from "./feature-walkthrough"
+import { 
+  saveOnboardingCompleted, 
+  hasCompletedOnboarding, 
+  shouldShowOnboardingAgain, 
+  clearShowOnboardingAgain
+} from "@/lib/storage"
 
 type OnboardingStage = "welcome" | "walkthrough" | "completed"
 
@@ -10,24 +16,21 @@ interface OnboardingFlowProps {
   onComplete?: () => void
 }
 
-const ONBOARDING_STORAGE_KEY = "invoice-generator-onboarding-completed"
-const ONBOARDING_SHOW_AGAIN_KEY = "invoice-generator-show-onboarding-again"
-
 export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [currentStage, setCurrentStage] = useState<OnboardingStage>("welcome")
   const [shouldShowOnboarding, setShouldShowOnboarding] = useState(false)
 
   useEffect(() => {
     // Check if user has completed onboarding
-    const hasCompletedOnboarding = localStorage.getItem(ONBOARDING_STORAGE_KEY) === "true"
-    const shouldShowAgain = localStorage.getItem(ONBOARDING_SHOW_AGAIN_KEY) === "true"
+    const completedOnboarding = hasCompletedOnboarding()
+    const showAgain = shouldShowOnboardingAgain()
     
     // Show onboarding if it's a first-time user or they explicitly requested to see it again
-    if (!hasCompletedOnboarding || shouldShowAgain) {
+    if (!completedOnboarding || showAgain) {
       setShouldShowOnboarding(true)
       // Clear the "show again" flag
-      if (shouldShowAgain) {
-        localStorage.removeItem(ONBOARDING_SHOW_AGAIN_KEY)
+      if (showAgain) {
+        clearShowOnboardingAgain()
       }
     }
   }, [])
@@ -38,14 +41,14 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
   const handleWalkthroughComplete = () => {
     setCurrentStage("completed")
-    localStorage.setItem(ONBOARDING_STORAGE_KEY, "true")
+    saveOnboardingCompleted()
     setShouldShowOnboarding(false)
     onComplete?.()
   }
 
   const handleSkip = () => {
     setCurrentStage("completed")
-    localStorage.setItem(ONBOARDING_STORAGE_KEY, "true")
+    saveOnboardingCompleted()
     setShouldShowOnboarding(false)
     onComplete?.()
   }
@@ -72,23 +75,4 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       )}
     </>
   )
-}
-
-// Utility function to manually trigger onboarding (for testing or "Show Tour" button)
-export function triggerOnboarding() {
-  localStorage.setItem(ONBOARDING_SHOW_AGAIN_KEY, "true")
-  // Reload the page to trigger onboarding
-  window.location.reload()
-}
-
-// Utility function to reset onboarding state (for development/testing)
-export function resetOnboardingState() {
-  localStorage.removeItem(ONBOARDING_STORAGE_KEY)
-  localStorage.removeItem(ONBOARDING_SHOW_AGAIN_KEY)
-}
-
-// Check if user has completed onboarding
-export function hasCompletedOnboarding(): boolean {
-  if (typeof window === "undefined") return false
-  return localStorage.getItem(ONBOARDING_STORAGE_KEY) === "true"
 }

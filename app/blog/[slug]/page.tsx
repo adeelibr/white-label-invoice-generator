@@ -7,7 +7,6 @@ import { ArrowLeft, Calendar, Clock, User } from 'lucide-react'
 import { Metadata } from 'next'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import rehypeHighlight from 'rehype-highlight'
 
 interface Props {
   params: { slug: string }
@@ -159,7 +158,6 @@ export default function BlogPost({ params }: Props) {
           <div className="article-content max-w-none">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
-              rehypePlugins={[rehypeHighlight]}
               components={{
                 // Headers with proper spacing and typography
                 h1: ({ children }) => (

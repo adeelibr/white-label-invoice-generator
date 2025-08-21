@@ -17,9 +17,23 @@ import { OnboardingFlow } from "./onboarding-flow"
 import { Header } from "./header"
 import { HeroSection } from "./hero-section"
 import type { TemplateType } from "./templates"
-import { saveInvoice, getInvoice, saveTheme, getTheme, getDefaultTheme, triggerOnboarding, type InvoiceData, type LineItem } from "@/lib/storage"
+import { saveInvoice, getInvoice, saveTheme, getTheme, getDefaultTheme, triggerOnboarding, getClientById, getNextInvoiceNumber, type InvoiceData, type LineItem, type Client, type InvoiceHistoryItem } from "@/lib/storage"
 
-export function InvoiceGenerator() {
+export interface InvoiceGeneratorProps {
+  initialData?: InvoiceHistoryItem
+  clientId?: string | null
+  onSave?: (invoiceData: InvoiceData) => void
+  hideHeader?: boolean
+  hideHeroSection?: boolean
+}
+
+export function InvoiceGenerator({ 
+  initialData, 
+  clientId, 
+  onSave,
+  hideHeader = false,
+  hideHeroSection = false 
+}: InvoiceGeneratorProps = {}) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const invoicePreviewRef = useRef<HTMLDivElement>(null)
   const [logoPreview, setLogoPreview] = useState<string>("")
@@ -59,19 +73,71 @@ export function InvoiceGenerator() {
     saveTheme(theme)
   }, [theme])
 
+  // Initialize with client data or provided data
   useEffect(() => {
-    const savedData = getInvoice()
-    if (savedData) {
-      setInvoiceData(savedData)
-      if (savedData.logo) {
-        setLogoPreview(savedData.logo)
+    if (initialData) {
+      // Load from provided initial data (editing mode)
+      setInvoiceData({
+        invoiceNumber: initialData.invoiceNumber,
+        purchaseOrder: initialData.purchaseOrder,
+        logo: initialData.logo,
+        companyDetails: initialData.companyDetails,
+        billTo: initialData.billTo,
+        currency: initialData.currency,
+        invoiceDate: initialData.invoiceDate,
+        dueDate: initialData.dueDate,
+        lineItems: initialData.lineItems,
+        notes: initialData.notes,
+        bankDetails: initialData.bankDetails,
+        subtotal: initialData.subtotal,
+        taxRate: initialData.taxRate,
+        discount: initialData.discount,
+        shippingFee: initialData.shippingFee,
+        total: initialData.total,
+      })
+      if (initialData.logo) {
+        setLogoPreview(initialData.logo)
+      }
+    } else if (clientId) {
+      // Initialize for new invoice with client context
+      const client = getClientById(clientId)
+      const newInvoiceData = {
+        invoiceNumber: getNextInvoiceNumber(clientId),
+        purchaseOrder: "",
+        logo: "",
+        companyDetails: "",
+        billTo: client ? client.address : "",
+        currency: "USD",
+        invoiceDate: new Date().toISOString().split("T")[0],
+        dueDate: "",
+        lineItems: [{ id: "1", description: "", unitCost: "", quantity: "1", amount: 0 }],
+        notes: "",
+        bankDetails: "",
+        subtotal: 0,
+        taxRate: "",
+        discount: "",
+        shippingFee: "",
+        total: 0,
+      }
+      setInvoiceData(newInvoiceData)
+    } else {
+      // Legacy mode: load from localStorage
+      const savedData = getInvoice()
+      if (savedData) {
+        setInvoiceData(savedData)
+        if (savedData.logo) {
+          setLogoPreview(savedData.logo)
+        }
       }
     }
-  }, [])
+  }, [initialData, clientId])
 
+  // Save to localStorage only in legacy mode (when no onSave callback)
   useEffect(() => {
-    saveInvoice(invoiceData)
-  }, [invoiceData])
+    if (!onSave) {
+      saveInvoice(invoiceData)
+    }
+  }, [invoiceData, onSave])
 
   const getThemeClasses = () => {
     const colorSchemes = {
@@ -219,6 +285,12 @@ export function InvoiceGenerator() {
 
   const handleCreateInvoice = async () => {
     calculateTotals()
+    
+    // If onSave is provided (multi-client mode), save and return
+    if (onSave) {
+      onSave(invoiceData)
+      return
+    }
 
     if (!invoicePreviewRef.current) {
       console.error("Invoice preview not found")
@@ -352,15 +424,17 @@ export function InvoiceGenerator() {
       <OnboardingFlow />
       
       {/* Enhanced Header */}
-      <Header
-        theme={theme}
-        themeClasses={themeClasses}
-        onShowThemeSettings={() => setShowThemeSettings(true)}
-        onShowTemplateSelection={() => setShowTemplateSelection(true)}
-      />
+      {!hideHeader && (
+        <Header
+          theme={theme}
+          themeClasses={themeClasses}
+          onShowThemeSettings={() => setShowThemeSettings(true)}
+          onShowTemplateSelection={() => setShowTemplateSelection(true)}
+        />
+      )}
 
       {/* Enhanced Hero Section */}
-      <HeroSection themeClasses={themeClasses} />
+      {!hideHeroSection && <HeroSection themeClasses={themeClasses} />}
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -715,7 +789,7 @@ export function InvoiceGenerator() {
               size="lg"
             >
               <Download className="h-5 w-5 mr-2" />
-              Create & Download Invoice
+              {onSave ? 'Save Invoice' : 'Create & Download Invoice'}
             </Button>
           </div>
 

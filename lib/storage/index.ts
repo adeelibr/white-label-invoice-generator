@@ -3,7 +3,7 @@
  * Centralized exports for all localStorage operations
  */
 
-// Invoice data operations
+// Invoice data operations (legacy - single invoice)
 export {
   saveInvoice,
   getInvoice,
@@ -12,6 +12,38 @@ export {
   type InvoiceData,
   type LineItem
 } from './invoiceStorage'
+
+// Client management operations
+export {
+  getAllClients,
+  addClient,
+  updateClient,
+  deleteClient,
+  getClientById,
+  searchClients,
+  incrementClientInvoiceCount,
+  getClientStats,
+  type Client
+} from './clientStorage'
+
+// Invoice history operations
+export {
+  getAllInvoices,
+  addInvoiceToHistory,
+  updateInvoice,
+  deleteInvoice,
+  getInvoiceById,
+  getInvoicesByClient,
+  getFilteredInvoices,
+  duplicateInvoice,
+  getInvoiceStats,
+  markInvoiceAsPaid,
+  searchInvoices,
+  getNextInvoiceNumber,
+  type InvoiceHistoryItem,
+  type InvoiceFilter,
+  type InvoiceSortOptions
+} from './invoiceHistoryStorage'
 
 // Settings and theme operations
 export {

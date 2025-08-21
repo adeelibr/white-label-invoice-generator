@@ -1,5 +1,6 @@
 import { InvoiceGenerator } from "@/components/invoice-generator"
 import { Footer } from "@/components/footer"
+import { NavigationMenu } from "@/components/navigation-menu"
 import Script from "next/script"
 
 export default function HomePage() {
@@ -52,6 +53,7 @@ export default function HomePage() {
           __html: JSON.stringify(structuredData),
         }}
       />
+      <NavigationMenu />
       <main className="min-h-screen bg-background">
         <InvoiceGenerator />
         <Footer />

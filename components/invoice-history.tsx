@@ -241,7 +241,7 @@ export function InvoiceHistory({
             </div>
             
             <div className="flex space-x-2">
-              <Select value={filter.status || "all"} onValueChange={(value) => setFilter(prev => ({ ...prev, status: value === "all" ? undefined : value as any }))}>
+              <Select value={filter.status || "all"} onValueChange={(value) => setFilter(prev => ({ ...prev, status: value === "all" ? undefined : value as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled' }))}>
                 <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>

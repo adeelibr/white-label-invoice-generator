@@ -3,6 +3,15 @@ import path from 'path'
 import matter from 'gray-matter'
 import { marked } from 'marked'
 
+// Configure marked for better markdown processing
+marked.setOptions({
+  gfm: true, // GitHub Flavored Markdown
+  breaks: true, // Convert \n to <br>
+  pedantic: false,
+  sanitize: false, // Allow HTML in markdown
+  smartypants: true, // Use smart quotes and other typography
+})
+
 export interface BlogPost {
   slug: string
   title: string

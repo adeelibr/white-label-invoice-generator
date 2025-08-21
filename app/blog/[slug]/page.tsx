@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Calendar, Clock, User } from 'lucide-react'
 import { Metadata } from 'next'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeHighlight from 'rehype-highlight'
 
 interface Props {
   params: { slug: string }
@@ -89,7 +92,7 @@ export default function BlogPost({ params }: Props) {
       <div className="min-h-screen bg-background">
         {/* Header */}
         <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="container max-w-4xl mx-auto px-4 py-6">
+          <div className="container max-w-5xl mx-auto px-4 py-6">
             <div className="flex items-center gap-4 mb-6">
               <Link href="/blog">
                 <Button variant="outline" size="sm">
@@ -107,7 +110,7 @@ export default function BlogPost({ params }: Props) {
         </div>
 
         {/* Article */}
-        <article className="container max-w-4xl mx-auto px-4 py-12">
+        <article className="container max-w-5xl mx-auto px-4 py-12">
           {/* Article Header */}
           <header className="mb-16">
             <div className="flex flex-wrap gap-2 mb-6">
@@ -153,33 +156,157 @@ export default function BlogPost({ params }: Props) {
           </header>
 
           {/* Article Content */}
-          <div 
-            className="prose prose-gray dark:prose-invert max-w-none prose-xl
-                       prose-headings:font-bold prose-headings:tracking-tight prose-headings:scroll-mt-20
-                       prose-h1:text-4xl prose-h1:mb-8 prose-h1:mt-12 prose-h1:leading-tight
-                       prose-h2:text-3xl prose-h2:mb-8 prose-h2:mt-16 prose-h2:border-b prose-h2:border-muted prose-h2:pb-4
-                       prose-h3:text-2xl prose-h3:mb-6 prose-h3:mt-12 prose-h3:text-primary prose-h3:font-bold
-                       prose-h4:text-xl prose-h4:mb-4 prose-h4:mt-8 prose-h4:font-semibold prose-h4:text-foreground
-                       prose-p:leading-relaxed prose-p:mb-6 prose-p:text-muted-foreground prose-p:text-[17px] prose-p:font-normal
-                       prose-li:leading-relaxed prose-li:mb-3 prose-li:text-muted-foreground prose-li:text-[17px]
-                       prose-ul:mb-8 prose-ul:pl-6 prose-ol:mb-8 prose-ol:pl-6 prose-ul:space-y-2 prose-ol:space-y-2
-                       prose-li:marker:text-primary prose-li:pl-2
-                       prose-a:text-primary prose-a:font-medium prose-a:no-underline prose-a:decoration-primary prose-a:underline-offset-4
-                       hover:prose-a:text-primary/80 hover:prose-a:underline
-                       prose-strong:text-foreground prose-strong:font-semibold
-                       prose-code:bg-muted/80 prose-code:px-2 prose-code:py-1 prose-code:rounded-md prose-code:text-sm prose-code:font-mono prose-code:text-foreground
-                       prose-pre:bg-muted/50 prose-pre:border prose-pre:border-border prose-pre:rounded-xl prose-pre:p-6 prose-pre:my-8 prose-pre:overflow-x-auto
-                       prose-pre:shadow-sm dark:prose-pre:bg-muted/30 dark:prose-pre:border-border/30
-                       prose-blockquote:border-l-primary prose-blockquote:border-l-4 prose-blockquote:pl-8 prose-blockquote:py-4
-                       prose-blockquote:my-8 prose-blockquote:italic prose-blockquote:text-muted-foreground prose-blockquote:bg-muted/30 prose-blockquote:rounded-r-lg
-                       prose-img:rounded-lg prose-img:shadow-lg prose-img:border prose-img:my-8
-                       prose-hr:border-muted prose-hr:my-12
-                       prose-table:border-collapse prose-table:border prose-table:border-muted
-                       prose-th:border prose-th:border-muted prose-th:bg-muted/50 prose-th:px-4 prose-th:py-3 prose-th:text-left prose-th:font-semibold
-                       prose-td:border prose-td:border-muted prose-td:px-4 prose-td:py-3
-                       first:prose-p:mt-0 last:prose-p:mb-0"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
+          <div className="article-content max-w-none">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeHighlight]}
+              components={{
+                // Headers with proper spacing and typography
+                h1: ({ children }) => (
+                  <h1 className="text-4xl md:text-5xl font-bold tracking-tight mt-16 mb-8 leading-tight text-foreground first:mt-0">
+                    {children}
+                  </h1>
+                ),
+                h2: ({ children }) => (
+                  <h2 className="text-3xl md:text-4xl font-bold tracking-tight mt-20 mb-10 leading-tight text-foreground border-b border-muted pb-6">
+                    {children}
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="text-2xl md:text-3xl font-bold tracking-tight mt-16 mb-8 leading-tight text-primary">
+                    {children}
+                  </h3>
+                ),
+                h4: ({ children }) => (
+                  <h4 className="text-xl md:text-2xl font-semibold mt-12 mb-6 leading-tight text-foreground">
+                    {children}
+                  </h4>
+                ),
+                h5: ({ children }) => (
+                  <h5 className="text-lg md:text-xl font-semibold mt-10 mb-5 leading-tight text-foreground">
+                    {children}
+                  </h5>
+                ),
+                h6: ({ children }) => (
+                  <h6 className="text-base md:text-lg font-semibold mt-8 mb-4 leading-tight text-foreground">
+                    {children}
+                  </h6>
+                ),
+                
+                // Paragraphs with generous spacing and improved readability
+                p: ({ children }) => (
+                  <p className="text-lg md:text-xl leading-loose mb-8 text-muted-foreground font-normal">
+                    {children}
+                  </p>
+                ),
+                
+                // Lists with better spacing
+                ul: ({ children }) => (
+                  <ul className="mb-10 pl-8 space-y-4">
+                    {children}
+                  </ul>
+                ),
+                ol: ({ children }) => (
+                  <ol className="mb-10 pl-8 space-y-4">
+                    {children}
+                  </ol>
+                ),
+                li: ({ children }) => (
+                  <li className="text-lg md:text-xl leading-loose text-muted-foreground marker:text-primary pl-2">
+                    {children}
+                  </li>
+                ),
+                
+                // Links with proper styling
+                a: ({ href, children }) => (
+                  <Link 
+                    href={href || '#'} 
+                    className="text-primary font-medium underline decoration-primary underline-offset-4 hover:text-primary/80 transition-colors"
+                  >
+                    {children}
+                  </Link>
+                ),
+                
+                // Strong/Bold text
+                strong: ({ children }) => (
+                  <strong className="font-semibold text-foreground">
+                    {children}
+                  </strong>
+                ),
+                
+                // Emphasis/Italic text
+                em: ({ children }) => (
+                  <em className="italic text-muted-foreground">
+                    {children}
+                  </em>
+                ),
+                
+                // Code blocks with improved styling
+                code: ({ className, children }) => {
+                  const isInline = !className
+                  if (isInline) {
+                    return (
+                      <code className="bg-muted/80 px-3 py-1 rounded-md text-sm font-mono text-foreground border">
+                        {children}
+                      </code>
+                    )
+                  }
+                  return (
+                    <code className={className}>
+                      {children}
+                    </code>
+                  )
+                },
+                pre: ({ children }) => (
+                  <pre className="bg-muted/50 border border-border rounded-xl p-8 my-12 overflow-x-auto shadow-sm text-sm font-mono leading-relaxed">
+                    {children}
+                  </pre>
+                ),
+                
+                // Blockquotes with better styling
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-8 border-primary pl-12 py-6 my-12 italic text-xl text-muted-foreground bg-muted/30 rounded-r-lg">
+                    {children}
+                  </blockquote>
+                ),
+                
+                // Horizontal rules
+                hr: () => (
+                  <hr className="border-muted my-16 border-t-2" />
+                ),
+                
+                // Tables with better styling
+                table: ({ children }) => (
+                  <div className="overflow-x-auto my-12">
+                    <table className="w-full border-collapse border border-muted rounded-lg">
+                      {children}
+                    </table>
+                  </div>
+                ),
+                th: ({ children }) => (
+                  <th className="border border-muted bg-muted/50 px-6 py-4 text-left font-semibold text-foreground">
+                    {children}
+                  </th>
+                ),
+                td: ({ children }) => (
+                  <td className="border border-muted px-6 py-4 text-muted-foreground">
+                    {children}
+                  </td>
+                ),
+                
+                // Images with better styling
+                img: ({ src, alt }) => (
+                  <img 
+                    src={src} 
+                    alt={alt} 
+                    className="rounded-lg shadow-lg border my-12 w-full" 
+                  />
+                ),
+              }}
+            >
+              {post.content}
+            </ReactMarkdown>
+          </div>
 
           {/* Call to Action */}
           <div className="mt-20 p-8 md:p-12 bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 rounded-2xl border border-primary/20 text-center">

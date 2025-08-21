@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Import highlight.js theme for code syntax highlighting */
+@import "highlight.js/styles/github.css";
+
 @custom-variant dark (&:is(.dark *));
 
 :root {

@@ -16,7 +16,7 @@ export interface InvoiceData {
   invoiceNumber: string;
   companyDetails: string;
   billTo: string;
-  [key: string]: any;
+  [key: string]: string | number | boolean | undefined;
 }
 
 /**
@@ -144,7 +144,7 @@ export async function exportToPDF(
           return Array.from(styleSheet.cssRules)
             .map((rule) => rule.cssText)
             .join('\n');
-        } catch (e) {
+        } catch {
           // Handle cross-origin stylesheets
           return '';
         }
@@ -199,11 +199,11 @@ export async function exportToPNG(
 ): Promise<void> {
   try {
     // Check if html2canvas is available
-    if (typeof window === 'undefined' || !(window as any).html2canvas) {
+    if (typeof window === 'undefined' || !((window as unknown as { html2canvas?: unknown }).html2canvas)) {
       throw new Error('PNG export requires html2canvas library');
     }
 
-    const html2canvas = (window as any).html2canvas;
+    const html2canvas = (window as unknown as { html2canvas: (element: HTMLElement, options: Record<string, unknown>) => Promise<HTMLCanvasElement> }).html2canvas;
     const filename = options.filename || 'invoice.png';
     const quality = options.quality || 0.95;
 
@@ -261,7 +261,7 @@ export async function exportToHTML(
             return Array.from(styleSheet.cssRules)
               .map((rule) => rule.cssText)
               .join('\n');
-          } catch (e) {
+          } catch {
             return '';
           }
         })
@@ -367,7 +367,7 @@ export function checkExportCompatibility(): {
 } {
   return {
     pdf: typeof window !== 'undefined' && typeof window.print === 'function',
-    png: typeof window !== 'undefined' && !!(window as any).html2canvas,
+    png: typeof window !== 'undefined' && !!((window as unknown as { html2canvas?: unknown }).html2canvas),
     html: typeof window !== 'undefined' && typeof Blob !== 'undefined'
   };
 }

@@ -14,15 +14,11 @@ import {
   FileText, 
   Download, 
   Upload, 
-  X, 
   Sparkles, 
   Zap, 
   Shield, 
   Settings, 
   Eye,
-  Moon,
-  Sun,
-  Monitor,
   Palette
 } from "lucide-react"
 import { DynamicInvoicePreview } from "./dynamic-invoice-preview"
@@ -40,7 +36,6 @@ import {
   calculateInvoiceTotals, 
   calculateLineItemAmount, 
   formatCurrency,
-  validateNumericInput,
   type LineItem
 } from "@/lib/calculations"
 import { validateInvoiceForm } from "@/lib/validation"

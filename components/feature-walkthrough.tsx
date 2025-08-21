@@ -85,45 +85,57 @@ export function FeatureWalkthrough({ onComplete, onSkip }: FeatureWalkthroughPro
 
   const currentStepData = walkthroughSteps[currentStep]
 
-  // Calculate position based on highlighted element
+  // Calculate position based on highlighted element and auto-scroll
   useEffect(() => {
     if (currentStepData.highlightSelector) {
       const element = document.querySelector(currentStepData.highlightSelector)
       if (element) {
-        const rect = element.getBoundingClientRect()
-        const cardWidth = 384 // max-w-sm = 24rem = 384px
-        const cardHeight = 300 // approximate height
+        // Auto-scroll to the element smoothly
+        element.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center',
+          inline: 'nearest' 
+        })
         
-        let top = 0
-        let left = 0
-        
-        switch (currentStepData.position) {
-          case "top":
-            top = rect.top - cardHeight - 20
-            left = rect.left + (rect.width / 2) - (cardWidth / 2)
-            break
-          case "bottom":
-            top = rect.bottom + 20
-            left = rect.left + (rect.width / 2) - (cardWidth / 2)
-            break
-          case "left":
-            top = rect.top + (rect.height / 2) - (cardHeight / 2)
-            left = rect.left - cardWidth - 20
-            break
-          case "right":
-            top = rect.top + (rect.height / 2) - (cardHeight / 2)
-            left = rect.right + 20
-            break
-          default:
-            top = window.innerHeight / 2 - cardHeight / 2
-            left = window.innerWidth / 2 - cardWidth / 2
-        }
-        
-        // Ensure card stays within viewport
-        top = Math.max(20, Math.min(top, window.innerHeight - cardHeight - 20))
-        left = Math.max(20, Math.min(left, window.innerWidth - cardWidth - 20))
-        
-        setCardPosition({ top, left })
+        // Small delay to ensure scroll is complete before calculating position
+        const timer = setTimeout(() => {
+          const rect = element.getBoundingClientRect()
+          const cardWidth = 384 // max-w-sm = 24rem = 384px
+          const cardHeight = 300 // approximate height
+          
+          let top = 0
+          let left = 0
+          
+          switch (currentStepData.position) {
+            case "top":
+              top = rect.top - cardHeight - 20
+              left = rect.left + (rect.width / 2) - (cardWidth / 2)
+              break
+            case "bottom":
+              top = rect.bottom + 20
+              left = rect.left + (rect.width / 2) - (cardWidth / 2)
+              break
+            case "left":
+              top = rect.top + (rect.height / 2) - (cardHeight / 2)
+              left = rect.left - cardWidth - 20
+              break
+            case "right":
+              top = rect.top + (rect.height / 2) - (cardHeight / 2)
+              left = rect.right + 20
+              break
+            default:
+              top = window.innerHeight / 2 - cardHeight / 2
+              left = window.innerWidth / 2 - cardWidth / 2
+          }
+          
+          // Ensure card stays within viewport
+          top = Math.max(20, Math.min(top, window.innerHeight - cardHeight - 20))
+          left = Math.max(20, Math.min(left, window.innerWidth - cardWidth - 20))
+          
+          setCardPosition({ top, left })
+        }, 300) // Wait for smooth scroll to complete
+
+        return () => clearTimeout(timer)
       }
     }
   }, [currentStep, currentStepData])

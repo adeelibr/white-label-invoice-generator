@@ -42,7 +42,7 @@ export function ModernTemplate({ data, theme }: InvoiceTemplateProps) {
               <img
                 src={data.logo || "/placeholder.svg"}
                 alt="Company Logo"
-                className="h-10 w-auto max-w-[100px] object-contain brightness-0 invert"
+                className="h-10 w-auto max-w-[100px] object-contain"
                 crossOrigin="anonymous"
               />
             ) : (

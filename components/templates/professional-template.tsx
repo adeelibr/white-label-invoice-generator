@@ -43,7 +43,7 @@ export function ProfessionalTemplate({ data, theme }: InvoiceTemplateProps) {
                 <img
                   src={data.logo || "/placeholder.svg"}
                   alt="Company Logo"
-                  className="h-12 w-auto max-w-[120px] object-contain brightness-0 invert"
+                  className="h-12 w-auto max-w-[120px] object-contain"
                   crossOrigin="anonymous"
                 />
               ) : (

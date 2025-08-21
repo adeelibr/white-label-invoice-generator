@@ -112,7 +112,7 @@ export function ThemeSettings({ isOpen, onClose, theme, onThemeChange }: ThemeSe
               <div
                 key={key}
                 className={`group p-6 rounded-xl border-2 cursor-pointer transition-all duration-300 hover:scale-[1.02] ${
-                  theme.colorScheme === key
+                  theme?.colorScheme === key
                     ? "border-violet-500 bg-gradient-to-r from-violet-50 via-blue-50 to-cyan-50 shadow-lg"
                     : "border-slate-200 hover:border-violet-300 bg-white hover:bg-gradient-to-r hover:from-violet-50/30 hover:via-blue-50/30 hover:to-cyan-50/30 hover:shadow-md"
                 }`}
@@ -122,7 +122,7 @@ export function ThemeSettings({ isOpen, onClose, theme, onThemeChange }: ThemeSe
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-3">
                       <h4 className="text-lg font-bold text-slate-800">{scheme.name}</h4>
-                      {theme.colorScheme === key && (
+                      {theme?.colorScheme === key && (
                         <span className="px-3 py-1 bg-violet-500 text-white text-xs font-semibold rounded-full">
                           Active
                         </span>
@@ -167,7 +167,7 @@ export function ThemeSettings({ isOpen, onClose, theme, onThemeChange }: ThemeSe
               <div
                 key={key}
                 className={`group p-6 rounded-xl border-2 cursor-pointer transition-all duration-300 hover:scale-[1.01] ${
-                  theme.fontPair === key
+                  theme?.fontPair === key
                     ? "border-blue-500 bg-gradient-to-r from-blue-50 via-indigo-50 to-violet-50 shadow-lg"
                     : "border-slate-200 hover:border-blue-300 bg-white hover:bg-gradient-to-r hover:from-blue-50/30 hover:via-indigo-50/30 hover:to-violet-50/30 hover:shadow-md"
                 }`}
@@ -177,7 +177,7 @@ export function ThemeSettings({ isOpen, onClose, theme, onThemeChange }: ThemeSe
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <h4 className="text-lg font-bold text-slate-800">{fonts.name}</h4>
-                      {theme.fontPair === key && (
+                      {theme?.fontPair === key && (
                         <span className="px-3 py-1 bg-blue-500 text-white text-xs font-semibold rounded-full">
                           Active
                         </span>

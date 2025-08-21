@@ -6,15 +6,17 @@ export const metadata = {
 }
 
 interface ClientPageProps {
-  params: {
+  params: Promise<{
     clientId: string
-  }
+  }>
 }
 
-export default function ClientPage({ params }: ClientPageProps) {
+export default async function ClientPage({ params }: ClientPageProps) {
+  const { clientId } = await params
+  
   return (
     <div className="min-h-screen bg-background">
-      <ClientOverview clientId={params.clientId} />
+      <ClientOverview clientId={clientId} />
     </div>
   )
 }

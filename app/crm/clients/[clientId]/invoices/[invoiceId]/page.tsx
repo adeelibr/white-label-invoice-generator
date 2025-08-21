@@ -6,18 +6,20 @@ export const metadata = {
 }
 
 interface EditInvoicePageProps {
-  params: {
+  params: Promise<{
     clientId: string
     invoiceId: string
-  }
+  }>
 }
 
-export default function EditInvoicePage({ params }: EditInvoicePageProps) {
+export default async function EditInvoicePage({ params }: EditInvoicePageProps) {
+  const { clientId, invoiceId } = await params
+  
   return (
     <div className="min-h-screen bg-background">
       <CRMInvoiceGenerator 
-        clientId={params.clientId} 
-        invoiceId={params.invoiceId} 
+        clientId={clientId} 
+        invoiceId={invoiceId} 
       />
     </div>
   )

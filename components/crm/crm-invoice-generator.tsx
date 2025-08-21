@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -61,15 +61,7 @@ export function CRMInvoiceGenerator({ clientId, invoiceId }: CRMInvoiceGenerator
     total: 0,
   })
 
-  useEffect(() => {
-    loadData()
-  }, [clientId, invoiceId])
-
-  useEffect(() => {
-    calculateTotals()
-  }, [invoiceData.lineItems, invoiceData.taxRate, invoiceData.discount, invoiceData.shippingFee])
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setIsLoading(true)
     try {
       // Load client data
@@ -111,16 +103,7 @@ export function CRMInvoiceGenerator({ clientId, invoiceId }: CRMInvoiceGenerator
     } finally {
       setIsLoading(false)
     }
-  }
-
-  const generateInvoiceNumber = (): string => {
-    const date = new Date()
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    const timestamp = Date.now().toString().slice(-4)
-    return `INV-${year}${month}${day}-${timestamp}`
-  }
+  }, [clientId, invoiceId, router])
 
   const calculateTotals = () => {
     const subtotal = invoiceData.lineItems.reduce((sum, item) => {
@@ -136,15 +119,45 @@ export function CRMInvoiceGenerator({ clientId, invoiceId }: CRMInvoiceGenerator
     const taxAmount = subtotal * (taxRate / 100)
     const total = subtotal + taxAmount + shippingFee - discount
 
-    setInvoiceData(prev => ({
-      ...prev,
-      subtotal,
-      total: Math.max(0, total),
-      lineItems: prev.lineItems.map(item => ({
+    setInvoiceData(prev => {
+      const newLineItems = prev.lineItems.map(item => ({
         ...item,
         amount: (parseFloat(item.unitCost) || 0) * (parseFloat(item.quantity) || 0)
       }))
-    }))
+
+      // Only update if values have actually changed
+      if (
+        prev.subtotal === subtotal &&
+        prev.total === Math.max(0, total) &&
+        JSON.stringify(prev.lineItems) === JSON.stringify(newLineItems)
+      ) {
+        return prev
+      }
+
+      return {
+        ...prev,
+        subtotal,
+        total: Math.max(0, total),
+        lineItems: newLineItems
+      }
+    })
+  }
+
+  useEffect(() => {
+    loadData()
+  }, [loadData])
+
+  useEffect(() => {
+    calculateTotals()
+  }, [invoiceData.lineItems, invoiceData.taxRate, invoiceData.discount, invoiceData.shippingFee])
+
+  const generateInvoiceNumber = (): string => {
+    const date = new Date()
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const timestamp = Date.now().toString().slice(-4)
+    return `INV-${year}${month}${day}-${timestamp}`
   }
 
   const handleSaveInvoice = async () => {

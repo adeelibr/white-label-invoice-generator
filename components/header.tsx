@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button"
-import { FileText, Settings, Shield, HelpCircle, Eye } from "lucide-react"
-import { triggerOnboarding } from "./onboarding-flow"
+import { FileText, Settings, Shield, HelpCircle, Eye, BookOpen } from "lucide-react"
+import { triggerOnboarding } from "@/lib/storage"
 import type { ThemeConfig } from "./theme-settings"
+import Link from "next/link"
 
 interface HeaderProps {
   theme: ThemeConfig
@@ -48,6 +49,19 @@ export function Header({
           
           {/* Enhanced navigation buttons */}
           <div className="flex items-center space-x-3">
+            {/* Blog button */}
+            <Link href="/blog">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-slate-600 hover:text-slate-800 hover:bg-slate-100 transition-colors duration-200"
+                title="Read our blog"
+              >
+                <BookOpen className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Blog</span>
+              </Button>
+            </Link>
+            
             {/* Help/Tour button */}
             <Button
               variant="ghost"

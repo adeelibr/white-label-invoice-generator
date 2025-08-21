@@ -43,3 +43,23 @@ export {
   type OnboardingState,
   type UserSession
 } from './userStorage'
+
+// Client and CRM operations
+export {
+  getAllClients,
+  getClient,
+  saveClient,
+  updateClient,
+  deleteClient,
+  getClientInvoices,
+  getAllInvoices,
+  getClientInvoiceById,
+  saveClientInvoice,
+  updateClientInvoice,
+  deleteInvoice,
+  deleteAllClientInvoices,
+  getClientInvoiceCount,
+  searchClients,
+  type Client,
+  type ClientInvoice
+} from './clientStorage'

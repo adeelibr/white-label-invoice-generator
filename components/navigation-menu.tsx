@@ -3,7 +3,7 @@
 import React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, Home, Users, FileText, X } from "lucide-react"
+import { Menu, Home, Users, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Sheet,

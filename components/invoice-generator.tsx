@@ -15,7 +15,7 @@ import { ThemeSettings, type ThemeConfig } from "./theme-settings"
 import { TemplateSelection } from "./template-selection"
 import { OnboardingFlow } from "./onboarding-flow" 
 import { Header } from "./header"
-import { HeroSection } from "./hero-section"
+import { EnhancedHeroSection } from "./enhanced-hero-section"
 import type { TemplateType } from "./templates"
 import { saveInvoice, getInvoice, type InvoiceData, type LineItem } from "@/lib/storage"
 import { initializeTheme, initializeTemplate, handleThemeChange, handleTemplateChange, getThemeClasses } from "@/lib/utils"
@@ -319,13 +319,13 @@ export function InvoiceGenerator() {
       />
 
       {/* Enhanced Hero Section */}
-      <HeroSection themeClasses={themeClasses} />
+      <EnhancedHeroSection themeClasses={themeClasses} />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Invoice Form */}
-          <div id="invoice-form-section" className="space-y-6">
+          <div id="invoice-form-section" data-section="invoice-form" className="space-y-6">
             <Card className="border-0 shadow-xl bg-white/70 backdrop-blur-sm">
               <CardHeader className={`bg-gradient-to-r from- bg-transparent${themeClasses.accent}/10 to-blue-500/10 rounded-t-lg`}>
                 <CardTitle className="text-xl font-bold text-slate-800 flex items-center space-x-2">

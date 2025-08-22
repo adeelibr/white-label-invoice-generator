@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -23,108 +23,62 @@ import {
   Eye
 } from "lucide-react"
 import Link from "next/link"
-import { toast } from "sonner"
 import { format } from "date-fns"
 import { Header } from "@/components/header"
-import { ThemeSettings, type ThemeConfig } from "@/components/theme-settings"
+import { ThemeSettings } from "@/components/theme-settings"
 import { TemplateSelection } from "@/components/template-selection"
 import { OnboardingFlow } from "@/components/onboarding-flow"
-import { 
-  getClient,
-  getClientInvoices,
-  getTheme,
-  getDefaultTheme,
-  type Client,
-  type ClientInvoice
-} from "@/lib/storage"
-import {
-  getThemeClasses,
-  handleThemeChange,
-  getEmptyClientForm,
-  populateClientForm,
-  updateExistingClient,
-  deleteInvoiceWithConfirmation,
-  getInvoiceStatusBadge,
-  type ClientFormData,
-  type ThemeClasses
-} from "@/lib/utils"
+import { deleteInvoiceWithConfirmation, getInvoiceStatusBadge } from "@/lib/utils"
+import { useTheme, useClient, useTypedModal } from "@/lib/hooks"
 
 interface ClientOverviewProps {
   clientId: string
 }
 
 export function ClientOverview({ clientId }: ClientOverviewProps) {
-  const [client, setClient] = useState<Client | null>(null)
-  const [invoices, setInvoices] = useState<ClientInvoice[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  // Use custom hooks instead of individual state management
+  const { 
+    theme, 
+    themeClasses, 
+    showThemeSettings, 
+    showTemplateSelection,
+    selectedTemplate,
+    onThemeChange,
+    onTemplateChange,
+    setShowThemeSettings,
+    setShowTemplateSelection 
+  } = useTheme()
   
-  // Theme states
-  const [theme, setTheme] = useState<ThemeConfig>(getDefaultTheme())
-  const [showThemeSettings, setShowThemeSettings] = useState(false)
-  const [showTemplateSelection, setShowTemplateSelection] = useState(false)
+  const {
+    client,
+    clientForm,
+    invoices,
+    isLoading,
+    loadClient,
+    setClientForm,
+    updateClient,
+    handleEditClient
+  } = useClient()
   
-  // Edit client states
-  const [showEditClient, setShowEditClient] = useState(false)
-  const [clientForm, setClientForm] = useState<ClientFormData>(getEmptyClientForm())
+  const modal = useTypedModal<'editClient'>()
 
-  const loadClientData = useCallback(async () => {
-    setIsLoading(true)
-    try {
-      const clientData = getClient(clientId)
-      const clientInvoices = getClientInvoices(clientId)
-      
-      setClient(clientData)
-      setInvoices(clientInvoices)
-      
-      if (!clientData) {
-        toast.error("Client not found")
-      }
-    } catch (error) {
-      console.error("Failed to load client data:", error)
-      toast.error("Failed to load client data")
-    } finally {
-      setIsLoading(false)
-    }
-  }, [clientId])
-
+  // Load client data on mount
   useEffect(() => {
-    loadClientData()
-  }, [loadClientData])
-
-  useEffect(() => {
-    const savedTheme = getTheme()
-    if (savedTheme) {
-      setTheme(savedTheme)
-    }
-  }, [])
-
-  // Get theme classes using the utility function
-  const themeClasses: ThemeClasses = getThemeClasses(theme)
-
-  // Theme change handler using utility
-  const onThemeChange = (newTheme: ThemeConfig) => {
-    handleThemeChange(newTheme, setTheme)
-  }
-
-  const handleEditClient = () => {
-    if (!client) return
-    
-    setClientForm(populateClientForm(client))
-    setShowEditClient(true)
-  }
+    loadClient(clientId)
+  }, [clientId, loadClient])
 
   const handleSaveClient = async () => {
-    const result = await updateExistingClient(clientId, clientForm)
+    const result = await updateClient(clientId)
     if (result.success) {
-      setShowEditClient(false)
-      loadClientData() // Reload the client data to reflect changes
+      modal.closeModal('editClient')
     }
   }
 
   const handleDeleteInvoice = async (invoiceId: string) => {
     const success = await deleteInvoiceWithConfirmation(invoiceId)
     if (success) {
-      loadClientData()
+      // Reload client data to reflect changes
+      loadClient(clientId)
     }
   }
 
@@ -225,7 +179,10 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   Client Information
-                  <Button variant="ghost" size="sm" onClick={handleEditClient}>
+                  <Button variant="ghost" size="sm" onClick={() => {
+                    handleEditClient(client)
+                    modal.openModal('editClient')
+                  }}>
                     <Edit className="h-4 w-4" />
                   </Button>
                 </CardTitle>
@@ -411,22 +368,14 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
       <TemplateSelection
         isOpen={showTemplateSelection}
         onClose={() => setShowTemplateSelection(false)}
-        selectedTemplate="classic"
-        onTemplateSelect={() => {}}
+        currentTemplate={selectedTemplate}
+        onTemplateChange={onTemplateChange}
       />
 
       {/* Edit Client Dialog */}
-      <Dialog open={showEditClient} onOpenChange={(open) => {
-        setShowEditClient(open)
+      <Dialog open={modal.isOpen('editClient')} onOpenChange={(open) => {
         if (!open) {
-          setClientForm({
-            name: "",
-            company: "",
-            email: "",
-            phone: "",
-            address: "",
-            notes: ""
-          })
+          modal.closeModal('editClient')
         }
       }}>
         <DialogContent className="max-w-md">
@@ -502,7 +451,7 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
           <div className="flex justify-end space-x-2 pt-4">
             <Button 
               variant="outline" 
-              onClick={() => setShowEditClient(false)}
+              onClick={() => modal.closeModal('editClient')}
             >
               Cancel
             </Button>

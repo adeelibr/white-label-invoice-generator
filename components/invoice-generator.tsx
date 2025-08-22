@@ -17,67 +17,61 @@ import { OnboardingFlow } from "./onboarding-flow"
 import { Header } from "./header"
 import { HeroSection } from "./hero-section"
 import type { TemplateType } from "./templates"
-import { saveInvoice, getInvoice, type InvoiceData, type LineItem } from "@/lib/storage"
-import { initializeTheme, initializeTemplate, handleThemeChange, handleTemplateChange, getThemeClasses } from "@/lib/utils"
 import { useSoundEffects } from "@/lib/sounds"
+import { useTheme, useInvoice } from "@/lib/hooks"
 
 export function InvoiceGenerator() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const invoicePreviewRef = useRef<HTMLDivElement>(null)
   const { playSound } = useSoundEffects()
   const [logoPreview, setLogoPreview] = useState<string>("")
-  const [showThemeSettings, setShowThemeSettings] = useState(false)
-  const [showTemplateSelection, setShowTemplateSelection] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>(initializeTemplate())
 
-  const [theme, setTheme] = useState<ThemeConfig>(initializeTheme())
+  // Use custom hooks
+  const { 
+    theme,
+    selectedTemplate,
+    themeClasses,
+    showThemeSettings,
+    showTemplateSelection,
+    onThemeChange: baseOnThemeChange,
+    onTemplateChange: baseOnTemplateChange,
+    setShowThemeSettings,
+    setShowTemplateSelection 
+  } = useTheme()
+
+  const { 
+    invoiceData, 
+    setInvoiceData,
+    loadInvoice,
+    addLineItem,
+    removeLineItem,
+    calculateTotals 
+  } = useInvoice()
 
   // Enhanced theme change handler with sound effects
   const onThemeChange = (newTheme: ThemeConfig) => {
-    handleThemeChange(newTheme, setTheme)
+    baseOnThemeChange(newTheme)
     playSound('theme')
   }
 
   // Enhanced template change handler with sound effects
   const onTemplateChange = (newTemplate: TemplateType) => {
-    handleTemplateChange(newTemplate, setSelectedTemplate)
+    baseOnTemplateChange(newTemplate)
     playSound('theme') // Use same sound for template changes
   }
 
-  const [invoiceData, setInvoiceData] = useState<InvoiceData>({
-    invoiceNumber: "",
-    purchaseOrder: "",
-    logo: "",
-    companyDetails: "",
-    billTo: "",
-    currency: "USD",
-    invoiceDate: new Date().toISOString().split("T")[0],
-    dueDate: "",
-    lineItems: [{ id: "1", description: "", unitCost: "", quantity: "1", amount: 0 }],
-    notes: "",
-    bankDetails: "",
-    subtotal: 0,
-    taxRate: "",
-    discount: "",
-    shippingFee: "",
-    total: 0,
-  })
-
+  // Load invoice data on mount and set logo preview
   useEffect(() => {
-    const savedData = getInvoice()
-    if (savedData) {
-      setInvoiceData(savedData)
-      if (savedData.logo) {
-        setLogoPreview(savedData.logo)
-      }
+    loadInvoice()
+  }, [loadInvoice])
+
+  // Update logo preview when invoice data logo changes  
+  useEffect(() => {
+    if (invoiceData.logo) {
+      setLogoPreview(invoiceData.logo)
     }
-  }, [])
+  }, [invoiceData.logo])
 
-  useEffect(() => {
-    saveInvoice(invoiceData)
-  }, [invoiceData])
-
-  const themeClasses = getThemeClasses(theme)
 
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -115,26 +109,7 @@ export function InvoiceGenerator() {
     }
   }
 
-  const addLineItem = () => {
-    const newItem: LineItem = {
-      id: Date.now().toString(),
-      description: "",
-      unitCost: "",
-      quantity: "1",
-      amount: 0,
-    }
-    setInvoiceData((prev) => ({
-      ...prev,
-      lineItems: [...prev.lineItems, newItem],
-    }))
-  }
 
-  const removeLineItem = (id: string) => {
-    setInvoiceData((prev) => ({
-      ...prev,
-      lineItems: prev.lineItems.filter((item) => item.id !== id),
-    }))
-  }
 
   const updateLineItem = (id: string, field: keyof LineItem, value: string) => {
     setInvoiceData((prev) => ({
@@ -154,24 +129,7 @@ export function InvoiceGenerator() {
     }))
   }
 
-  const calculateTotals = () => {
-    const subtotal = invoiceData.lineItems.reduce((sum, item) => sum + item.amount, 0)
-    const taxAmount = (subtotal * (Number.parseFloat(invoiceData.taxRate) || 0)) / 100
-    const discountAmount = Number.parseFloat(invoiceData.discount) || 0
-    const shippingAmount = Number.parseFloat(invoiceData.shippingFee) || 0
-    const total = subtotal + taxAmount - discountAmount + shippingAmount
 
-    setInvoiceData((prev) => ({
-      ...prev,
-      subtotal,
-      total,
-    }))
-  }
-
-  // Recalculate totals when line items or rates change
-  useEffect(() => {
-    calculateTotals()
-  }, [invoiceData.lineItems, invoiceData.taxRate, invoiceData.discount, invoiceData.shippingFee])
 
   const handleCreateInvoice = async () => {
     calculateTotals()

@@ -1,29 +1,7 @@
 /**
  * Utilities index
- * Centralized exports for all reusable utility functions
+ * 
+ * This file serves as a directory marker for the utils folder.
+ * Individual utility modules are exported through the main utils.ts file
+ * to maintain compatibility with existing import paths.
  */
-
-// Theme utilities
-export {
-  getThemeClasses,
-  handleThemeChange,
-  initializeTheme,
-  type ThemeClasses
-} from './themeUtils'
-
-// Client form utilities
-export {
-  getEmptyClientForm,
-  populateClientForm,
-  validateClientForm,
-  saveNewClient,
-  updateExistingClient,
-  type ClientFormData
-} from './clientFormUtils'
-
-// Client operations utilities
-export {
-  deleteClientWithConfirmation,
-  deleteInvoiceWithConfirmation,
-  getInvoiceStatusBadge
-} from './clientOperations'

@@ -5,7 +5,7 @@ import { SharedModal } from "@/components/ui/shared-modal"
 import { SoundSettings } from "@/components/sound-settings"
 
 export interface ThemeConfig {
-  colorScheme: "violet-blue" | "emerald-teal" | "rose-pink" | "orange-amber" | "indigo-purple"
+  colorScheme: "violet-blue" | "emerald-teal" | "rose-pink" | "orange-amber" | "indigo-purple" | "premium-dark"
   fontPair: "modern" | "classic" | "elegant" | "minimal" | "creative"
 }
 
@@ -51,6 +51,13 @@ const colorSchemes = {
     secondary: "from-indigo-50 via-purple-50 to-violet-50",
     accent: "indigo-500",
     description: "Sophisticated and elegant",
+  },
+  "premium-dark": {
+    name: "Premium Dark",
+    primary: "from-lime-400 to-lime-500",
+    secondary: "from-gray-900 via-gray-800 to-gray-900",
+    accent: "lime-400",
+    description: "Cinematic dark theme with electric lime accents",
   },
 }
 

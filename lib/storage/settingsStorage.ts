@@ -4,7 +4,7 @@
  */
 
 export interface ThemeConfig {
-  colorScheme: "violet-blue" | "emerald-teal" | "rose-pink" | "orange-amber" | "indigo-purple"
+  colorScheme: "violet-blue" | "emerald-teal" | "rose-pink" | "orange-amber" | "indigo-purple" | "premium-dark"
   fontPair: "modern" | "classic" | "elegant" | "minimal" | "creative"
 }
 

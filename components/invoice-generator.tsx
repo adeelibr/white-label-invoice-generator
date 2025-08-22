@@ -48,10 +48,18 @@ export function InvoiceGenerator() {
     calculateTotals 
   } = useInvoice()
 
-  // Enhanced theme change handler with sound effects
+  // Enhanced theme change handler with sound effects and class management
   const onThemeChange = (newTheme: ThemeConfig) => {
     baseOnThemeChange(newTheme)
     playSound('theme')
+    
+    // Apply theme class to document
+    const documentElement = document.documentElement
+    documentElement.classList.remove('premium-dark', 'dark')
+    
+    if (newTheme.colorScheme === 'premium-dark') {
+      documentElement.classList.add('premium-dark')
+    }
   }
 
   // Enhanced template change handler with sound effects
@@ -64,6 +72,16 @@ export function InvoiceGenerator() {
   useEffect(() => {
     loadInvoice()
   }, [loadInvoice])
+
+  // Apply theme class on mount and when theme changes
+  useEffect(() => {
+    const documentElement = document.documentElement
+    documentElement.classList.remove('premium-dark', 'dark')
+    
+    if (theme.colorScheme === 'premium-dark') {
+      documentElement.classList.add('premium-dark')
+    }
+  }, [theme.colorScheme])
 
   // Update logo preview when invoice data logo changes  
   useEffect(() => {

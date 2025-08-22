@@ -64,6 +64,15 @@ export function getThemeClasses(theme: ThemeConfig): ThemeClasses {
       accentBorder: "indigo-300",
       accentText: "indigo-600",
     },
+    "premium-dark": {
+      primary: "from-lime-400 to-lime-500",
+      primaryHover: "from-lime-500 to-lime-600",
+      secondary: "from-gray-900 via-gray-800 to-gray-900",
+      accent: "lime-400",
+      accentLight: "lime-950/20",
+      accentBorder: "lime-600/30",
+      accentText: "lime-400",
+    },
   } as const
   
   return colorSchemes[theme.colorScheme]

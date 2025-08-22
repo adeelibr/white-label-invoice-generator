@@ -31,6 +31,7 @@ import {
   searchClients, 
   getClientInvoiceCount,
   saveClientInvoice,
+  saveClient,
   getTheme,
   getDefaultTheme,
   type Client,

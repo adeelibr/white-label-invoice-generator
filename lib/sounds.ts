@@ -2,144 +2,74 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-// Sound configuration with Web Audio API fallback
+// Sound configuration with audio files
 export const SOUNDS = {
   // Button interaction sounds
-  click: '/sounds/click.mp3',
-  clickSoft: '/sounds/click-soft.mp3', 
-  clickPrimary: '/sounds/click-primary.mp3',
-  clickSecondary: '/sounds/click-secondary.mp3',
+  click: '/sounds/click.wav',
+  clickSoft: '/sounds/click-soft.wav', 
+  clickPrimary: '/sounds/click-primary.wav',
+  clickSecondary: '/sounds/click-secondary.wav',
   
   // Key action sounds
-  success: '/sounds/success.mp3',
-  save: '/sounds/save.mp3',
-  download: '/sounds/download.mp3',
+  success: '/sounds/success.wav',
+  save: '/sounds/save.wav',
+  download: '/sounds/download.wav',
   
   // Input interactions
-  type: '/sounds/type.mp3',
-  focus: '/sounds/focus.mp3',
+  type: '/sounds/type.wav',
+  focus: '/sounds/focus.wav',
   
   // Special actions
-  theme: '/sounds/theme.mp3',
-  upload: '/sounds/upload.mp3'
+  theme: '/sounds/theme.wav',
+  upload: '/sounds/upload.wav'
 } as const
 
 export type SoundType = keyof typeof SOUNDS
 
-// Web Audio API synthetic sound generator
-class SynthSoundGenerator {
-  private audioContext: AudioContext | null = null
+// Audio file player class
+class AudioFilePlayer {
+  private audioCache: Map<string, HTMLAudioElement> = new Map()
 
-  private getAudioContext() {
-    if (!this.audioContext) {
-      this.audioContext = new (window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext || AudioContext)()
+  private getAudio(soundPath: string): HTMLAudioElement | null {
+    // Only create Audio objects on the client side
+    if (typeof window === 'undefined') return null
+    
+    if (!this.audioCache.has(soundPath)) {
+      const audio = new Audio(soundPath)
+      audio.preload = 'auto'
+      // Set reasonable defaults
+      audio.volume = 0.3
+      this.audioCache.set(soundPath, audio)
     }
-    return this.audioContext
+    return this.audioCache.get(soundPath)!
   }
 
-  playClick(volume = 0.3) {
-    const ctx = this.getAudioContext()
-    const oscillator = ctx.createOscillator()
-    const gainNode = ctx.createGain()
-    
-    oscillator.connect(gainNode)
-    gainNode.connect(ctx.destination)
-    
-    oscillator.frequency.setValueAtTime(800, ctx.currentTime)
-    oscillator.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.1)
-    
-    gainNode.gain.setValueAtTime(0, ctx.currentTime)
-    gainNode.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.01)
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1)
-    
-    oscillator.start(ctx.currentTime)
-    oscillator.stop(ctx.currentTime + 0.1)
+  async playAudio(soundPath: string, volume = 0.3) {
+    try {
+      const audio = this.getAudio(soundPath)
+      if (!audio) return // Skip if running on server
+      
+      audio.volume = volume
+      audio.currentTime = 0 // Reset to beginning for quick repeated plays
+      await audio.play()
+    } catch (error) {
+      // Silently fail if audio can't be played (e.g., user hasn't interacted with page yet)
+      console.debug('Audio playback failed:', error)
+    }
   }
 
-  playClickSoft(volume = 0.2) {
-    const ctx = this.getAudioContext()
-    const oscillator = ctx.createOscillator()
-    const gainNode = ctx.createGain()
+  preloadAll(sounds: Record<string, string>) {
+    // Only preload on client side
+    if (typeof window === 'undefined') return
     
-    oscillator.connect(gainNode)
-    gainNode.connect(ctx.destination)
-    
-    oscillator.frequency.setValueAtTime(600, ctx.currentTime)
-    oscillator.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.05)
-    
-    gainNode.gain.setValueAtTime(0, ctx.currentTime)
-    gainNode.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.01)
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05)
-    
-    oscillator.start(ctx.currentTime)
-    oscillator.stop(ctx.currentTime + 0.05)
-  }
-
-  playClickPrimary(volume = 0.35) {
-    const ctx = this.getAudioContext()
-    const oscillator = ctx.createOscillator()
-    const gainNode = ctx.createGain()
-    
-    oscillator.connect(gainNode)
-    gainNode.connect(ctx.destination)
-    
-    oscillator.frequency.setValueAtTime(1000, ctx.currentTime)
-    oscillator.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.08)
-    
-    gainNode.gain.setValueAtTime(0, ctx.currentTime)
-    gainNode.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.01)
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08)
-    
-    oscillator.start(ctx.currentTime)
-    oscillator.stop(ctx.currentTime + 0.08)
-  }
-
-  playSuccess(volume = 0.4) {
-    const ctx = this.getAudioContext()
-    
-    // Three-tone success sound
-    const frequencies = [523, 659, 784] // C, E, G
-    frequencies.forEach((freq, index) => {
-      const oscillator = ctx.createOscillator()
-      const gainNode = ctx.createGain()
-      
-      oscillator.connect(gainNode)
-      gainNode.connect(ctx.destination)
-      
-      const startTime = ctx.currentTime + index * 0.1
-      oscillator.frequency.setValueAtTime(freq, startTime)
-      
-      gainNode.gain.setValueAtTime(0, startTime)
-      gainNode.gain.linearRampToValueAtTime(volume * 0.8, startTime + 0.05)
-      gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 0.2)
-      
-      oscillator.start(startTime)
-      oscillator.stop(startTime + 0.2)
+    // Preload all sound files
+    Object.values(sounds).forEach(soundPath => {
+      this.getAudio(soundPath)
     })
-  }
-
-  playType(volume = 0.15) {
-    const ctx = this.getAudioContext()
-    const oscillator = ctx.createOscillator()
-    const gainNode = ctx.createGain()
-    
-    oscillator.connect(gainNode)
-    gainNode.connect(ctx.destination)
-    
-    oscillator.frequency.setValueAtTime(400, ctx.currentTime)
-    
-    gainNode.gain.setValueAtTime(0, ctx.currentTime)
-    gainNode.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.01)
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03)
-    
-    oscillator.start(ctx.currentTime)
-    oscillator.stop(ctx.currentTime + 0.03)
   }
 }
 
-export type SoundType = keyof typeof SOUNDS
 
-// Sound preferences management
 const SOUND_PREFERENCES_KEY = 'invoice-generator-sound-preferences'
 
 interface SoundPreferences {
@@ -185,56 +115,30 @@ export function useSoundPreferences() {
 // Main sound effects hook
 export function useSoundEffects() {
   const { preferences } = useSoundPreferences()
-  const [soundGenerator] = useState(() => new SynthSoundGenerator())
+  const [audioPlayer] = useState(() => {
+    const player = new AudioFilePlayer()
+    // Preload all sound files
+    player.preloadAll(SOUNDS)
+    return player
+  })
 
   const playSound = useCallback((soundType: SoundType) => {
     if (!preferences.enabled) return
 
+    const soundPath = SOUNDS[soundType]
+    if (!soundPath) {
+      console.warn(`Unknown sound type: ${soundType}`)
+      return
+    }
+
     try {
       const volume = preferences.volume
-      
-      switch (soundType) {
-        case 'click':
-          soundGenerator.playClick(volume)
-          break
-        case 'clickSoft':
-          soundGenerator.playClickSoft(volume * 0.7)
-          break
-        case 'clickPrimary':
-          soundGenerator.playClickPrimary(volume)
-          break
-        case 'clickSecondary':
-          soundGenerator.playClickSoft(volume * 0.8)
-          break
-        case 'success':
-          soundGenerator.playSuccess(volume)
-          break
-        case 'save':
-          soundGenerator.playSuccess(volume * 0.8)
-          break
-        case 'download':
-          soundGenerator.playSuccess(volume)
-          break
-        case 'type':
-          soundGenerator.playType(volume * 0.5)
-          break
-        case 'focus':
-          soundGenerator.playClickSoft(volume * 0.6)
-          break
-        case 'theme':
-          soundGenerator.playSuccess(volume * 0.7)
-          break
-        case 'upload':
-          soundGenerator.playClickPrimary(volume * 0.8)
-          break
-        default:
-          console.warn(`Unknown sound type: ${soundType}`)
-      }
+      audioPlayer.playAudio(soundPath, volume)
     } catch (error) {
-      // Silently fail if audio context is not available
+      // Silently fail if audio is not available
       console.debug('Audio not available:', error)
     }
-  }, [preferences.enabled, preferences.volume, soundGenerator])
+  }, [preferences.enabled, preferences.volume, audioPlayer])
 
   return {
     playSound,

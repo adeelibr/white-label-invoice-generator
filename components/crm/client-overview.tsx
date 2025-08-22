@@ -1,9 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { 
   ArrowLeft, 
   Plus, 
@@ -29,6 +33,7 @@ import {
   getClient,
   getClientInvoices,
   deleteInvoice,
+  updateClient,
   getTheme,
   getDefaultTheme,
   saveTheme,
@@ -49,10 +54,41 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
   const [theme, setTheme] = useState<ThemeConfig>(getDefaultTheme())
   const [showThemeSettings, setShowThemeSettings] = useState(false)
   const [showTemplateSelection, setShowTemplateSelection] = useState(false)
+  
+  // Edit client states
+  const [showEditClient, setShowEditClient] = useState(false)
+  const [clientForm, setClientForm] = useState({
+    name: "",
+    company: "",
+    email: "",
+    phone: "",
+    address: "",
+    notes: ""
+  })
+
+  const loadClientData = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const clientData = getClient(clientId)
+      const clientInvoices = getClientInvoices(clientId)
+      
+      setClient(clientData)
+      setInvoices(clientInvoices)
+      
+      if (!clientData) {
+        toast.error("Client not found")
+      }
+    } catch (error) {
+      console.error("Failed to load client data:", error)
+      toast.error("Failed to load client data")
+    } finally {
+      setIsLoading(false)
+    }
+  }, [clientId])
 
   useEffect(() => {
     loadClientData()
-  }, [clientId])
+  }, [loadClientData])
 
   useEffect(() => {
     const savedTheme = getTheme()
@@ -119,23 +155,38 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
     saveTheme(newTheme)
   }
 
-  const loadClientData = async () => {
-    setIsLoading(true)
+  const handleEditClient = () => {
+    if (!client) return
+    
+    setClientForm({
+      name: client.name,
+      company: client.company || "",
+      email: client.email || "",
+      phone: client.phone || "",
+      address: client.address || "",
+      notes: client.notes || ""
+    })
+    setShowEditClient(true)
+  }
+
+  const handleSaveClient = async () => {
+    if (!clientForm.name.trim()) {
+      toast.error("Client name is required")
+      return
+    }
+
     try {
-      const clientData = getClient(clientId)
-      const clientInvoices = getClientInvoices(clientId)
-      
-      setClient(clientData)
-      setInvoices(clientInvoices)
-      
-      if (!clientData) {
-        toast.error("Client not found")
+      const updated = updateClient(clientId, clientForm)
+      if (updated) {
+        toast.success("Client updated successfully")
+        setShowEditClient(false)
+        loadClientData() // Reload the client data to reflect changes
+      } else {
+        toast.error("Failed to update client")
       }
     } catch (error) {
-      console.error("Failed to load client data:", error)
-      toast.error("Failed to load client data")
-    } finally {
-      setIsLoading(false)
+      console.error("Failed to update client:", error)
+      toast.error("Failed to update client")
     }
   }
 
@@ -264,11 +315,9 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   Client Information
-                  <Link href={`/crm/clients/${clientId}/edit`}>
-                    <Button variant="ghost" size="sm">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  </Link>
+                  <Button variant="ghost" size="sm" onClick={handleEditClient}>
+                    <Edit className="h-4 w-4" />
+                  </Button>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -455,6 +504,104 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
         selectedTemplate="classic"
         onTemplateSelect={() => {}}
       />
+
+      {/* Edit Client Dialog */}
+      <Dialog open={showEditClient} onOpenChange={(open) => {
+        setShowEditClient(open)
+        if (!open) {
+          setClientForm({
+            name: "",
+            company: "",
+            email: "",
+            phone: "",
+            address: "",
+            notes: ""
+          })
+        }
+      }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Client</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="name">Name *</Label>
+              <Input
+                id="name"
+                value={clientForm.name}
+                onChange={(e) => setClientForm(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="Enter client name"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="company">Company</Label>
+              <Input
+                id="company"
+                value={clientForm.company}
+                onChange={(e) => setClientForm(prev => ({ ...prev, company: e.target.value }))}
+                placeholder="Enter company name"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={clientForm.email}
+                onChange={(e) => setClientForm(prev => ({ ...prev, email: e.target.value }))}
+                placeholder="Enter email address"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
+                value={clientForm.phone}
+                onChange={(e) => setClientForm(prev => ({ ...prev, phone: e.target.value }))}
+                placeholder="Enter phone number"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="address">Address</Label>
+              <Textarea
+                id="address"
+                value={clientForm.address}
+                onChange={(e) => setClientForm(prev => ({ ...prev, address: e.target.value }))}
+                placeholder="Enter address"
+                rows={3}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="notes">Notes</Label>
+              <Textarea
+                id="notes"
+                value={clientForm.notes}
+                onChange={(e) => setClientForm(prev => ({ ...prev, notes: e.target.value }))}
+                placeholder="Add notes about this client"
+                rows={3}
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowEditClient(false)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleSaveClient}>
+              Update Client
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

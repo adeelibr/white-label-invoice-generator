@@ -18,14 +18,23 @@ import { Header } from "./header"
 import { HeroSection } from "./hero-section"
 import type { TemplateType } from "./templates"
 import { saveInvoice, getInvoice, saveTheme, getTheme, getDefaultTheme, triggerOnboarding, type InvoiceData, type LineItem } from "@/lib/storage"
+import { useSoundEffects } from "@/lib/sounds"
 
 export function InvoiceGenerator() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const invoicePreviewRef = useRef<HTMLDivElement>(null)
+  const { playSound } = useSoundEffects()
   const [logoPreview, setLogoPreview] = useState<string>("")
   const [showThemeSettings, setShowThemeSettings] = useState(false)
   const [showTemplateSelection, setShowTemplateSelection] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>("classic")
+
+  // Enhanced theme change handler with sound effects
+  const handleThemeChange = (newTheme: ThemeConfig) => {
+    setTheme(newTheme)
+    playSound('theme')
+    saveTheme(newTheme)
+  }
 
   const [theme, setTheme] = useState<ThemeConfig>(getDefaultTheme())
 
@@ -146,6 +155,9 @@ export function InvoiceGenerator() {
         const result = e.target?.result as string
         setLogoPreview(result)
         setInvoiceData((prev) => ({ ...prev, logo: result }))
+        
+        // Play upload success sound
+        playSound('upload')
       }
       reader.readAsDataURL(file)
     }
@@ -219,6 +231,9 @@ export function InvoiceGenerator() {
 
   const handleCreateInvoice = async () => {
     calculateTotals()
+
+    // Play download sound effect
+    playSound('download')
 
     if (!invoicePreviewRef.current) {
       console.error("Invoice preview not found")
@@ -802,7 +817,7 @@ export function InvoiceGenerator() {
         isOpen={showThemeSettings}
         onClose={() => setShowThemeSettings(false)}
         theme={theme}
-        onThemeChange={setTheme}
+        onThemeChange={handleThemeChange}
       />
       
       <TemplateSelection

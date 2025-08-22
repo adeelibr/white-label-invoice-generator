@@ -2,6 +2,7 @@
 import { Label } from "@/components/ui/label"
 import { Palette, Type, Settings } from "lucide-react"
 import { SharedModal } from "@/components/ui/shared-modal"
+import { SoundSettings } from "@/components/sound-settings"
 
 export interface ThemeConfig {
   colorScheme: "violet-blue" | "emerald-teal" | "rose-pink" | "orange-amber" | "indigo-purple"
@@ -96,6 +97,11 @@ export function ThemeSettings({ isOpen, onClose, theme, onThemeChange }: ThemeSe
       icon={<Settings className="h-6 w-6" />}
     >
       <div className="space-y-8">
+        {/* Sound Settings */}
+        <div>
+          <SoundSettings />
+        </div>
+
         {/* Color Schemes */}
         <div>
           <div className="flex items-center space-x-3 mb-6">

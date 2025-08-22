@@ -25,6 +25,7 @@ export function ModernTemplate({ data, theme }: InvoiceTemplateProps) {
       "rose-pink": { primary: "bg-rose-600 text-white", secondary: "bg-rose-50", accent: "text-rose-600" },
       "orange-amber": { primary: "bg-orange-600 text-white", secondary: "bg-orange-50", accent: "text-orange-600" },
       "indigo-purple": { primary: "bg-indigo-600 text-white", secondary: "bg-indigo-50", accent: "text-indigo-600" },
+      "premium-dark": { primary: "bg-gray-900 text-lime-400", secondary: "bg-gray-800", accent: "text-lime-400" },
     }
     
     return colorMap[theme.colorScheme] || { primary: "bg-slate-900 text-white", secondary: "bg-slate-50", accent: "text-slate-600" }

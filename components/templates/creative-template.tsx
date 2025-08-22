@@ -55,6 +55,12 @@ export function CreativeTemplate({ data, theme }: InvoiceTemplateProps) {
         accent: "text-indigo-600",
         border: "border-indigo-200"
       },
+      "premium-dark": {
+        primary: "from-gray-900 to-lime-900",
+        secondary: "from-gray-800 to-gray-700", 
+        accent: "text-lime-400",
+        border: "border-lime-400"
+      },
     }
     
     return colorMap[theme.colorScheme] || { 

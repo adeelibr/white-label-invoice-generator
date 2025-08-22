@@ -25,6 +25,7 @@ export function ElegantTemplate({ data, theme }: InvoiceTemplateProps) {
       "rose-pink": { accent: "text-rose-700", light: "bg-rose-50", border: "border-rose-200" },
       "orange-amber": { accent: "text-amber-700", light: "bg-amber-50", border: "border-amber-200" },
       "indigo-purple": { accent: "text-purple-700", light: "bg-purple-50", border: "border-purple-200" },
+      "premium-dark": { accent: "text-lime-400", light: "bg-gray-800", border: "border-lime-400" },
     }
     
     return colorMap[theme.colorScheme] || { accent: "text-amber-700", light: "bg-amber-50", border: "border-amber-200" }

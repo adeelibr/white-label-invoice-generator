@@ -55,6 +55,12 @@ export function BoldTemplate({ data, theme }: InvoiceTemplateProps) {
         accent: "bg-pink-400 text-black",
         light: "bg-indigo-50"
       },
+      "premium-dark": {
+        primary: "bg-gray-900 text-lime-400",
+        secondary: "bg-gray-800 text-lime-400", 
+        accent: "bg-lime-400 text-black",
+        light: "bg-gray-800"
+      },
     }
     
     return colorMap[theme.colorScheme] || { 

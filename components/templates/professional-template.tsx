@@ -25,6 +25,7 @@ export function ProfessionalTemplate({ data, theme }: InvoiceTemplateProps) {
       "rose-pink": { primary: "bg-slate-800 text-white", accent: "text-rose-700", light: "bg-rose-50" },
       "orange-amber": { primary: "bg-slate-800 text-white", accent: "text-orange-700", light: "bg-orange-50" },
       "indigo-purple": { primary: "bg-slate-800 text-white", accent: "text-indigo-700", light: "bg-indigo-50" },
+      "premium-dark": { primary: "bg-gray-900 text-lime-400", accent: "text-lime-400", light: "bg-gray-800" },
     }
     
     return colorMap[theme.colorScheme] || { primary: "bg-slate-800 text-white", accent: "text-slate-700", light: "bg-slate-100" }

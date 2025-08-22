@@ -17,7 +17,8 @@ import {
   FileText,
   ArrowLeft,
   Edit,
-  Trash2
+  Trash2,
+  Database
 } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
@@ -32,10 +33,12 @@ import {
   deleteClient, 
   searchClients, 
   getClientInvoiceCount,
+  saveClientInvoice,
   getTheme,
   getDefaultTheme,
   saveTheme,
-  type Client 
+  type Client,
+  type InvoiceData
 } from "@/lib/storage"
 
 export function ClientsDirectory() {
@@ -229,6 +232,128 @@ export function ClientsDirectory() {
     }
   }
 
+  const generateDummyData = async () => {
+    try {
+      // Dummy client data
+      const dummyClients = [
+        {
+          name: "Acme Corporation",
+          company: "Acme Corp",
+          email: "contact@acmecorp.com",
+          phone: "+1 (555) 123-4567",
+          address: "123 Business Ave\nNew York, NY 10001\nUnited States",
+          notes: "Fortune 500 company, requires NET 30 payment terms"
+        },
+        {
+          name: "Tech Innovations LLC",
+          company: "Tech Innovations",
+          email: "hello@techinnovations.com",
+          phone: "+1 (555) 987-6543",
+          address: "456 Silicon Valley Blvd\nSan Francisco, CA 94105\nUnited States",
+          notes: "Startup focused on AI and machine learning solutions"
+        },
+        {
+          name: "Global Marketing Solutions",
+          company: "GMS Agency",
+          email: "info@gmsagency.com",
+          phone: "+1 (555) 246-8135",
+          address: "789 Marketing Plaza\nChicago, IL 60601\nUnited States",
+          notes: "Full-service marketing agency, prefers quarterly billing"
+        }
+      ]
+
+      const savedClients = []
+
+      // Create clients
+      for (const clientData of dummyClients) {
+        const newClient = saveClient(clientData)
+        savedClients.push(newClient)
+      }
+
+      // Generate invoices for each client
+      for (const client of savedClients) {
+        const invoiceCount = Math.floor(Math.random() * 3) + 3 // 3-5 invoices per client
+        
+        for (let i = 0; i < invoiceCount; i++) {
+          const invoiceDate = new Date()
+          invoiceDate.setDate(invoiceDate.getDate() - Math.floor(Math.random() * 90)) // Random date in last 90 days
+          
+          const dueDate = new Date(invoiceDate)
+          dueDate.setDate(dueDate.getDate() + 30) // 30 days payment terms
+          
+          const services = [
+            { description: "Web Development", unitCost: "150.00" },
+            { description: "UI/UX Design", unitCost: "120.00" },
+            { description: "Consulting Services", unitCost: "200.00" },
+            { description: "Project Management", unitCost: "100.00" },
+            { description: "Content Creation", unitCost: "80.00" },
+            { description: "SEO Optimization", unitCost: "90.00" }
+          ]
+
+          const randomServices = services.sort(() => 0.5 - Math.random()).slice(0, Math.floor(Math.random() * 3) + 1)
+          
+          const lineItems = randomServices.map((service, index) => {
+            const quantity = Math.floor(Math.random() * 10) + 1
+            const unitCost = parseFloat(service.unitCost)
+            return {
+              id: (index + 1).toString(),
+              description: service.description,
+              unitCost: service.unitCost,
+              quantity: quantity.toString(),
+              amount: unitCost * quantity
+            }
+          })
+
+          const subtotal = lineItems.reduce((sum, item) => sum + item.amount, 0)
+          const taxRate = Math.random() > 0.5 ? "10" : "0"
+          const taxAmount = subtotal * (parseFloat(taxRate) / 100)
+          const total = subtotal + taxAmount
+
+          const invoiceNumber = `INV-${invoiceDate.getFullYear()}${String(invoiceDate.getMonth() + 1).padStart(2, '0')}${String(invoiceDate.getDate()).padStart(2, '0')}-${Date.now().toString().slice(-4)}`
+
+          const invoiceData: InvoiceData = {
+            invoiceNumber,
+            purchaseOrder: Math.random() > 0.5 ? `PO-${Math.floor(Math.random() * 9999).toString().padStart(4, '0')}` : "",
+            logo: "",
+            companyDetails: "Your Business Name\n123 Your Address\nYour City, State 12345\nPhone: (555) 123-4567\nEmail: hello@yourbusiness.com",
+            billTo: `${client.name}${client.company ? '\n' + client.company : ''}${client.address ? '\n' + client.address : ''}`,
+            currency: "USD",
+            invoiceDate: invoiceDate.toISOString().split("T")[0],
+            dueDate: dueDate.toISOString().split("T")[0],
+            lineItems,
+            notes: Math.random() > 0.5 ? "Thank you for your business!" : "Payment is due within 30 days.",
+            bankDetails: "Bank: Your Bank Name\nAccount: 1234567890\nRouting: 987654321",
+            subtotal,
+            taxRate,
+            discount: "",
+            shippingFee: "",
+            total
+          }
+
+          const statuses: ('draft' | 'sent' | 'paid' | 'overdue')[] = ['draft', 'sent', 'paid', 'overdue']
+          const status = statuses[Math.floor(Math.random() * statuses.length)]
+
+          saveClientInvoice({
+            clientId: client.id,
+            invoiceNumber,
+            date: invoiceData.invoiceDate,
+            dueDate: invoiceData.dueDate,
+            status,
+            total,
+            currency: "USD",
+            invoiceData
+          })
+        }
+      }
+
+      toast.success(`Generated ${savedClients.length} clients with ${savedClients.length * 4} invoices on average`)
+      loadClients()
+    } catch (error) {
+      console.error("Failed to generate dummy data:", error)
+      toast.error("Failed to generate dummy data")
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -269,10 +394,20 @@ export function ClientsDirectory() {
                 <p className="text-slate-600 mt-1">Manage your clients and their invoices</p>
               </div>
             </div>
-            <Button onClick={() => setShowAddClient(true)} className={`shadow-md bg-gradient-to-r ${themeClasses.primary} hover:${themeClasses.primaryHover} text-white`}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Client
-            </Button>
+            <div className="flex items-center space-x-3">
+              <Button 
+                onClick={generateDummyData}
+                variant="outline"
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <Database className="h-4 w-4 mr-2" />
+                Generate Demo Data
+              </Button>
+              <Button onClick={() => setShowAddClient(true)} className={`shadow-md bg-gradient-to-r ${themeClasses.primary} hover:${themeClasses.primaryHover} text-white`}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Client
+              </Button>
+            </div>
           </div>
         </div>
       </div>

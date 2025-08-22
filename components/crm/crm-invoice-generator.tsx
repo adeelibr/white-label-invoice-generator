@@ -16,6 +16,7 @@ import { Header } from "@/components/header"
 import { ThemeSettings, type ThemeConfig } from "@/components/theme-settings"
 import { TemplateSelection } from "@/components/template-selection"
 import { OnboardingFlow } from "@/components/onboarding-flow"
+import type { TemplateType } from "@/components/templates"
 import {
   getClient,
   getClientInvoiceById,
@@ -44,6 +45,7 @@ export function CRMInvoiceGenerator({ clientId, invoiceId }: CRMInvoiceGenerator
   const [showPreview, setShowPreview] = useState(false)
   const [showThemeSettings, setShowThemeSettings] = useState(false)
   const [showTemplateSelection, setShowTemplateSelection] = useState(false)
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>("classic")
   
   const [theme, setTheme] = useState<ThemeConfig>(getDefaultTheme())
 
@@ -695,6 +697,7 @@ export function CRMInvoiceGenerator({ clientId, invoiceId }: CRMInvoiceGenerator
                 <DynamicInvoicePreview 
                   data={invoiceData} 
                   theme={theme}
+                  template={selectedTemplate}
                 />
               </div>
             </div>
@@ -714,8 +717,8 @@ export function CRMInvoiceGenerator({ clientId, invoiceId }: CRMInvoiceGenerator
       <TemplateSelection
         isOpen={showTemplateSelection}
         onClose={() => setShowTemplateSelection(false)}
-        selectedTemplate="classic"
-        onTemplateSelect={() => {}}
+        currentTemplate={selectedTemplate}
+        onTemplateChange={setSelectedTemplate}
       />
     </div>
   )

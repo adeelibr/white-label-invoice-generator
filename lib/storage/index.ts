@@ -20,10 +20,16 @@ export {
   clearTheme,
   hasThemeConfig,
   getDefaultTheme,
+  saveTemplate,
+  getTemplate,
+  clearTemplate,
+  hasTemplateConfig,
+  getDefaultTemplate,
   savePreferences,
   getPreferences,
   clearPreferences,
   type ThemeConfig,
+  type TemplateType,
   type AppPreferences
 } from './settingsStorage'
 

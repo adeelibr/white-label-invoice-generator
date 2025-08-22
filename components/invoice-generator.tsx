@@ -17,7 +17,8 @@ import { OnboardingFlow } from "./onboarding-flow"
 import { Header } from "./header"
 import { HeroSection } from "./hero-section"
 import type { TemplateType } from "./templates"
-import { saveInvoice, getInvoice, saveTheme, getTheme, getDefaultTheme, triggerOnboarding, type InvoiceData, type LineItem } from "@/lib/storage"
+import { saveInvoice, getInvoice, type InvoiceData, type LineItem } from "@/lib/storage"
+import { initializeTheme, initializeTemplate, handleThemeChange, handleTemplateChange, getThemeClasses } from "@/lib/utils"
 import { useSoundEffects } from "@/lib/sounds"
 
 export function InvoiceGenerator() {
@@ -27,16 +28,21 @@ export function InvoiceGenerator() {
   const [logoPreview, setLogoPreview] = useState<string>("")
   const [showThemeSettings, setShowThemeSettings] = useState(false)
   const [showTemplateSelection, setShowTemplateSelection] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>("classic")
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>(initializeTemplate())
+
+  const [theme, setTheme] = useState<ThemeConfig>(initializeTheme())
 
   // Enhanced theme change handler with sound effects
-  const handleThemeChange = (newTheme: ThemeConfig) => {
-    setTheme(newTheme)
+  const onThemeChange = (newTheme: ThemeConfig) => {
+    handleThemeChange(newTheme, setTheme)
     playSound('theme')
-    saveTheme(newTheme)
   }
 
-  const [theme, setTheme] = useState<ThemeConfig>(getDefaultTheme())
+  // Enhanced template change handler with sound effects
+  const onTemplateChange = (newTemplate: TemplateType) => {
+    handleTemplateChange(newTemplate, setSelectedTemplate)
+    playSound('theme') // Use same sound for template changes
+  }
 
   const [invoiceData, setInvoiceData] = useState<InvoiceData>({
     invoiceNumber: "",
@@ -58,17 +64,6 @@ export function InvoiceGenerator() {
   })
 
   useEffect(() => {
-    const savedTheme = getTheme()
-    if (savedTheme) {
-      setTheme(savedTheme)
-    }
-  }, [])
-
-  useEffect(() => {
-    saveTheme(theme)
-  }, [theme])
-
-  useEffect(() => {
     const savedData = getInvoice()
     if (savedData) {
       setInvoiceData(savedData)
@@ -82,58 +77,7 @@ export function InvoiceGenerator() {
     saveInvoice(invoiceData)
   }, [invoiceData])
 
-  const getThemeClasses = () => {
-    const colorSchemes = {
-      "violet-blue": {
-        primary: "from-violet-600 to-blue-600",
-        primaryHover: "from-violet-700 to-blue-700",
-        secondary: "from-violet-50 via-blue-50 to-cyan-50",
-        accent: "violet-500",
-        accentLight: "violet-50",
-        accentBorder: "violet-300",
-        accentText: "violet-600",
-      },
-      "emerald-teal": {
-        primary: "from-emerald-600 to-teal-600",
-        primaryHover: "from-emerald-700 to-teal-700",
-        secondary: "from-emerald-50 via-teal-50 to-cyan-50",
-        accent: "emerald-500",
-        accentLight: "emerald-50",
-        accentBorder: "emerald-300",
-        accentText: "emerald-600",
-      },
-      "rose-pink": {
-        primary: "from-rose-600 to-pink-600",
-        primaryHover: "from-rose-700 to-pink-700",
-        secondary: "from-rose-50 via-pink-50 to-fuchsia-50",
-        accent: "rose-500",
-        accentLight: "rose-50",
-        accentBorder: "rose-300",
-        accentText: "rose-600",
-      },
-      "orange-amber": {
-        primary: "from-orange-600 to-amber-600",
-        primaryHover: "from-orange-700 to-amber-700",
-        secondary: "from-orange-50 via-amber-50 to-yellow-50",
-        accent: "orange-500",
-        accentLight: "orange-50",
-        accentBorder: "orange-300",
-        accentText: "orange-600",
-      },
-      "indigo-purple": {
-        primary: "from-indigo-600 to-purple-600",
-        primaryHover: "from-indigo-700 to-purple-700",
-        secondary: "from-indigo-50 via-purple-50 to-violet-50",
-        accent: "indigo-500",
-        accentLight: "indigo-50",
-        accentBorder: "indigo-300",
-        accentText: "indigo-600",
-      },
-    }
-    return colorSchemes[theme.colorScheme]
-  }
-
-  const themeClasses = getThemeClasses()
+  const themeClasses = getThemeClasses(theme)
 
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -817,14 +761,14 @@ export function InvoiceGenerator() {
         isOpen={showThemeSettings}
         onClose={() => setShowThemeSettings(false)}
         theme={theme}
-        onThemeChange={handleThemeChange}
+        onThemeChange={onThemeChange}
       />
       
       <TemplateSelection
         isOpen={showTemplateSelection}
         onClose={() => setShowTemplateSelection(false)}
         currentTemplate={selectedTemplate}
-        onTemplateChange={setSelectedTemplate}
+        onTemplateChange={onTemplateChange}
       />
     </div>
   )

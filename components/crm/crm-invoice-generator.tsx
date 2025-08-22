@@ -22,14 +22,19 @@ import {
   getClientInvoiceById,
   saveClientInvoice,
   updateClientInvoice,
-  getTheme,
-  getDefaultTheme,
-  saveTheme,
   type Client,
   type ClientInvoice,
   type InvoiceData,
   type LineItem
 } from "@/lib/storage"
+import {
+  getThemeClasses,
+  handleThemeChange,
+  initializeTheme,
+  handleTemplateChange,
+  initializeTemplate,
+  type ThemeClasses
+} from "@/lib/utils"
 
 interface CRMInvoiceGeneratorProps {
   clientId: string
@@ -45,9 +50,9 @@ export function CRMInvoiceGenerator({ clientId, invoiceId }: CRMInvoiceGenerator
   const [showPreview, setShowPreview] = useState(false)
   const [showThemeSettings, setShowThemeSettings] = useState(false)
   const [showTemplateSelection, setShowTemplateSelection] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>("classic")
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>(initializeTemplate())
   
-  const [theme, setTheme] = useState<ThemeConfig>(getDefaultTheme())
+  const [theme, setTheme] = useState<ThemeConfig>(initializeTheme())
 
   const [invoiceData, setInvoiceData] = useState<InvoiceData>({
     invoiceNumber: "",
@@ -80,12 +85,6 @@ export function CRMInvoiceGenerator({ clientId, invoiceId }: CRMInvoiceGenerator
       }
       setClient(clientData)
 
-      // Load theme
-      const savedTheme = getTheme()
-      if (savedTheme) {
-        setTheme(savedTheme)
-      }
-
       // If editing existing invoice, load invoice data
       if (invoiceId) {
         const existingInvoice = getClientInvoiceById(invoiceId)
@@ -112,62 +111,15 @@ export function CRMInvoiceGenerator({ clientId, invoiceId }: CRMInvoiceGenerator
     }
   }, [clientId, invoiceId, router])
 
-  const getThemeClasses = () => {
-    const colorSchemes = {
-      "violet-blue": {
-        primary: "from-violet-600 to-blue-600",
-        primaryHover: "from-violet-700 to-blue-700",
-        secondary: "from-violet-50 via-blue-50 to-cyan-50",
-        accent: "violet-500",
-        accentLight: "violet-50",
-        accentBorder: "violet-300",
-        accentText: "violet-600",
-      },
-      "emerald-teal": {
-        primary: "from-emerald-600 to-teal-600",
-        primaryHover: "from-emerald-700 to-teal-700",
-        secondary: "from-emerald-50 via-teal-50 to-cyan-50",
-        accent: "emerald-500",
-        accentLight: "emerald-50",
-        accentBorder: "emerald-300",
-        accentText: "emerald-600",
-      },
-      "rose-pink": {
-        primary: "from-rose-600 to-pink-600",
-        primaryHover: "from-rose-700 to-pink-700",
-        secondary: "from-rose-50 via-pink-50 to-fuchsia-50",
-        accent: "rose-500",
-        accentLight: "rose-50",
-        accentBorder: "rose-300",
-        accentText: "rose-600",
-      },
-      "orange-amber": {
-        primary: "from-orange-600 to-amber-600",
-        primaryHover: "from-orange-700 to-amber-700",
-        secondary: "from-orange-50 via-amber-50 to-yellow-50",
-        accent: "orange-500",
-        accentLight: "orange-50",
-        accentBorder: "orange-300",
-        accentText: "orange-600",
-      },
-      "indigo-purple": {
-        primary: "from-indigo-600 to-purple-600",
-        primaryHover: "from-indigo-700 to-purple-700",
-        secondary: "from-indigo-50 via-purple-50 to-violet-50",
-        accent: "indigo-500",
-        accentLight: "indigo-50",
-        accentBorder: "indigo-300",
-        accentText: "indigo-600",
-      },
-    }
-    return colorSchemes[theme.colorScheme]
+  // Use centralized theme utilities
+  const themeClasses: ThemeClasses = getThemeClasses(theme)
+  
+  const onThemeChange = (newTheme: ThemeConfig) => {
+    handleThemeChange(newTheme, setTheme)
   }
 
-  const themeClasses = getThemeClasses()
-
-  const handleThemeChange = (newTheme: ThemeConfig) => {
-    setTheme(newTheme)
-    saveTheme(newTheme)
+  const onTemplateChange = (newTemplate: TemplateType) => {
+    handleTemplateChange(newTemplate, setSelectedTemplate)
   }
 
   const calculateTotals = () => {
@@ -677,13 +629,6 @@ export function CRMInvoiceGenerator({ clientId, invoiceId }: CRMInvoiceGenerator
                 <h3 className="text-lg font-semibold">Preview</h3>
                 <div className="flex items-center space-x-2">
                   <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowThemeSettings(true)}
-                  >
-                    Customize
-                  </Button>
-                  <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowPreview(false)}
@@ -710,7 +655,7 @@ export function CRMInvoiceGenerator({ clientId, invoiceId }: CRMInvoiceGenerator
         isOpen={showThemeSettings}
         onClose={() => setShowThemeSettings(false)}
         theme={theme}
-        onThemeChange={handleThemeChange}
+        onThemeChange={onThemeChange}
       />
 
       {/* Template Selection Modal */}
@@ -718,7 +663,7 @@ export function CRMInvoiceGenerator({ clientId, invoiceId }: CRMInvoiceGenerator
         isOpen={showTemplateSelection}
         onClose={() => setShowTemplateSelection(false)}
         currentTemplate={selectedTemplate}
-        onTemplateChange={setSelectedTemplate}
+        onTemplateChange={onTemplateChange}
       />
     </div>
   )

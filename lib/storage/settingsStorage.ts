@@ -8,7 +8,10 @@ export interface ThemeConfig {
   fontPair: "modern" | "classic" | "elegant" | "minimal" | "creative"
 }
 
+export type TemplateType = "classic" | "modern" | "professional" | "creative" | "minimal" | "elegant" | "bold"
+
 const THEME_SETTINGS_KEY = "invoiceGeneratorTheme"
+const TEMPLATE_SETTINGS_KEY = "invoiceGeneratorTemplate"
 
 /**
  * Check if we're in a browser environment
@@ -89,6 +92,77 @@ export function getDefaultTheme(): ThemeConfig {
     colorScheme: "violet-blue",
     fontPair: "modern"
   }
+}
+
+/**
+ * Save template selection to localStorage
+ */
+export function saveTemplate(template: TemplateType): void {
+  if (!isBrowser()) {
+    console.warn("saveTemplate: localStorage not available")
+    return
+  }
+
+  try {
+    localStorage.setItem(TEMPLATE_SETTINGS_KEY, JSON.stringify(template))
+  } catch (error) {
+    console.error("Failed to save template setting:", error)
+  }
+}
+
+/**
+ * Get template selection from localStorage
+ */
+export function getTemplate(): TemplateType | null {
+  if (!isBrowser()) {
+    console.warn("getTemplate: localStorage not available")
+    return null
+  }
+
+  try {
+    const savedTemplate = localStorage.getItem(TEMPLATE_SETTINGS_KEY)
+    if (savedTemplate) {
+      return JSON.parse(savedTemplate) as TemplateType
+    }
+  } catch (error) {
+    console.error("Failed to load template setting:", error)
+  }
+
+  return null
+}
+
+/**
+ * Clear template selection from localStorage
+ */
+export function clearTemplate(): void {
+  if (!isBrowser()) {
+    console.warn("clearTemplate: localStorage not available")
+    return
+  }
+
+  try {
+    localStorage.removeItem(TEMPLATE_SETTINGS_KEY)
+  } catch (error) {
+    console.error("Failed to clear template setting:", error)
+  }
+}
+
+/**
+ * Get default template
+ */
+export function getDefaultTemplate(): TemplateType {
+  return "classic"
+}
+
+/**
+ * Check if template configuration exists in localStorage
+ */
+export function hasTemplateConfig(): boolean {
+  if (!isBrowser()) {
+    return false
+  }
+
+  return localStorage.getItem(TEMPLATE_SETTINGS_KEY) !== null
 }
 
 /**

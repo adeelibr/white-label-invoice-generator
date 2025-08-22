@@ -10,6 +10,8 @@ export {
   getThemeClasses,
   handleThemeChange,
   initializeTheme,
+  handleTemplateChange,
+  initializeTemplate,
   type ThemeClasses
 } from "./utils/themeUtils"
 

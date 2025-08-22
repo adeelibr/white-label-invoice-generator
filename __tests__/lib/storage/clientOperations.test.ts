@@ -1,5 +1,5 @@
 /**
- * Tests for client form utilities
+ * Tests for client operations with UI feedback
  */
 
 import {
@@ -7,8 +7,11 @@ import {
   populateClientForm,
   validateClientForm,
   saveNewClient,
-  updateExistingClient
-} from '../../../lib/utils/clientFormUtils'
+  updateExistingClient,
+  deleteClientWithConfirmation,
+  deleteInvoiceWithConfirmation,
+  getInvoiceStatusBadge
+} from '../../../lib/storage/clientOperations'
 import type { Client } from '@/lib/storage'
 
 // Mock dependencies
@@ -19,21 +22,30 @@ jest.mock('sonner', () => ({
   }
 }))
 
-jest.mock('@/lib/storage', () => ({
-  updateClient: jest.fn(),
+jest.mock('../../../lib/storage/clientStorage', () => ({
   saveClient: jest.fn(),
+  updateClient: jest.fn(),
+  deleteClient: jest.fn(),
+  deleteInvoice: jest.fn(),
 }))
 
+// Mock global confirm function
+const mockConfirm = jest.fn()
+global.confirm = mockConfirm
+
 import { toast } from 'sonner'
-import { updateClient, saveClient } from '@/lib/storage'
+import { saveClient, updateClient, deleteClient, deleteInvoice } from '../../../lib/storage/clientStorage'
 
 const mockToast = toast as jest.Mocked<typeof toast>
-const mockUpdateClient = updateClient as jest.MockedFunction<typeof updateClient>
 const mockSaveClient = saveClient as jest.MockedFunction<typeof saveClient>
+const mockUpdateClient = updateClient as jest.MockedFunction<typeof updateClient>
+const mockDeleteClient = deleteClient as jest.MockedFunction<typeof deleteClient>
+const mockDeleteInvoice = deleteInvoice as jest.MockedFunction<typeof deleteInvoice>
 
-describe('clientFormUtils', () => {
+describe('clientOperations', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockConfirm.mockClear()
   })
 
   describe('getEmptyClientForm', () => {
@@ -296,6 +308,112 @@ describe('clientFormUtils', () => {
       
       expect(result).toEqual({ success: false })
       expect(mockToast.error).toHaveBeenCalledWith('Failed to update client')
+    })
+  })
+
+  describe('deleteClientWithConfirmation', () => {
+    it('should delete client when confirmed', async () => {
+      mockConfirm.mockReturnValue(true)
+      mockDeleteClient.mockReturnValue(true)
+      
+      const result = await deleteClientWithConfirmation('client1')
+      
+      expect(mockConfirm).toHaveBeenCalledWith('Are you sure you want to delete this client? This will also delete all their invoices.')
+      expect(mockDeleteClient).toHaveBeenCalledWith('client1')
+      expect(mockToast.success).toHaveBeenCalledWith('Client deleted successfully')
+      expect(result).toBe(true)
+    })
+
+    it('should not delete client when cancelled', async () => {
+      mockConfirm.mockReturnValue(false)
+      
+      const result = await deleteClientWithConfirmation('client1')
+      
+      expect(mockConfirm).toHaveBeenCalledWith('Are you sure you want to delete this client? This will also delete all their invoices.')
+      expect(mockDeleteClient).not.toHaveBeenCalled()
+      expect(result).toBe(false)
+    })
+
+    it('should handle delete failure', async () => {
+      mockConfirm.mockReturnValue(true)
+      mockDeleteClient.mockReturnValue(false)
+      
+      const result = await deleteClientWithConfirmation('client1')
+      
+      expect(mockToast.error).toHaveBeenCalledWith('Failed to delete client')
+      expect(result).toBe(false)
+    })
+
+    it('should handle delete errors', async () => {
+      mockConfirm.mockReturnValue(true)
+      mockDeleteClient.mockImplementation(() => {
+        throw new Error('Delete failed')
+      })
+      
+      const result = await deleteClientWithConfirmation('client1')
+      
+      expect(mockToast.error).toHaveBeenCalledWith('Failed to delete client')
+      expect(result).toBe(false)
+    })
+  })
+
+  describe('deleteInvoiceWithConfirmation', () => {
+    it('should delete invoice when confirmed', async () => {
+      mockConfirm.mockReturnValue(true)
+      mockDeleteInvoice.mockReturnValue(true)
+      
+      const result = await deleteInvoiceWithConfirmation('invoice1')
+      
+      expect(mockConfirm).toHaveBeenCalledWith('Are you sure you want to delete this invoice?')
+      expect(mockDeleteInvoice).toHaveBeenCalledWith('invoice1')
+      expect(mockToast.success).toHaveBeenCalledWith('Invoice deleted successfully')
+      expect(result).toBe(true)
+    })
+
+    it('should not delete invoice when cancelled', async () => {
+      mockConfirm.mockReturnValue(false)
+      
+      const result = await deleteInvoiceWithConfirmation('invoice1')
+      
+      expect(mockConfirm).toHaveBeenCalledWith('Are you sure you want to delete this invoice?')
+      expect(mockDeleteInvoice).not.toHaveBeenCalled()
+      expect(result).toBe(false)
+    })
+
+    it('should handle delete failure', async () => {
+      mockConfirm.mockReturnValue(true)
+      mockDeleteInvoice.mockReturnValue(false)
+      
+      const result = await deleteInvoiceWithConfirmation('invoice1')
+      
+      expect(mockToast.error).toHaveBeenCalledWith('Failed to delete invoice')
+      expect(result).toBe(false)
+    })
+
+    it('should handle delete errors', async () => {
+      mockConfirm.mockReturnValue(true)
+      mockDeleteInvoice.mockImplementation(() => {
+        throw new Error('Delete failed')
+      })
+      
+      const result = await deleteInvoiceWithConfirmation('invoice1')
+      
+      expect(mockToast.error).toHaveBeenCalledWith('Failed to delete invoice')
+      expect(result).toBe(false)
+    })
+  })
+
+  describe('getInvoiceStatusBadge', () => {
+    it('should return correct colors for different statuses', () => {
+      expect(getInvoiceStatusBadge('draft')).toBe('bg-gray-100 text-gray-800')
+      expect(getInvoiceStatusBadge('sent')).toBe('bg-blue-100 text-blue-800')
+      expect(getInvoiceStatusBadge('paid')).toBe('bg-green-100 text-green-800')
+      expect(getInvoiceStatusBadge('overdue')).toBe('bg-red-100 text-red-800')
+    })
+
+    it('should return default color for unknown status', () => {
+      expect(getInvoiceStatusBadge('unknown')).toBe('bg-gray-100 text-gray-800')
+      expect(getInvoiceStatusBadge('')).toBe('bg-gray-100 text-gray-800')
     })
   })
 })

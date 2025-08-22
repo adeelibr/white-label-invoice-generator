@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// Re-export all utility functions from utils subdirectory
+// Re-export theme utilities
 export {
   getThemeClasses,
   handleThemeChange,
@@ -13,17 +13,15 @@ export {
   type ThemeClasses
 } from "./utils/themeUtils"
 
+// Re-export client operations from storage (moved from utils for better organization)
 export {
   getEmptyClientForm,
   populateClientForm,
   validateClientForm,
   saveNewClient,
   updateExistingClient,
-  type ClientFormData
-} from "./utils/clientFormUtils"
-
-export {
   deleteClientWithConfirmation,
   deleteInvoiceWithConfirmation,
-  getInvoiceStatusBadge
-} from "./utils/clientOperations"
+  getInvoiceStatusBadge,
+  type ClientFormData
+} from "./storage"

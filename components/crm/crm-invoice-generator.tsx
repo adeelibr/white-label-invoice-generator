@@ -31,6 +31,8 @@ import {
   getThemeClasses,
   handleThemeChange,
   initializeTheme,
+  handleTemplateChange,
+  initializeTemplate,
   type ThemeClasses
 } from "@/lib/utils"
 
@@ -48,7 +50,7 @@ export function CRMInvoiceGenerator({ clientId, invoiceId }: CRMInvoiceGenerator
   const [showPreview, setShowPreview] = useState(false)
   const [showThemeSettings, setShowThemeSettings] = useState(false)
   const [showTemplateSelection, setShowTemplateSelection] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>("classic")
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>(initializeTemplate())
   
   const [theme, setTheme] = useState<ThemeConfig>(initializeTheme())
 
@@ -114,6 +116,10 @@ export function CRMInvoiceGenerator({ clientId, invoiceId }: CRMInvoiceGenerator
   
   const onThemeChange = (newTheme: ThemeConfig) => {
     handleThemeChange(newTheme, setTheme)
+  }
+
+  const onTemplateChange = (newTemplate: TemplateType) => {
+    handleTemplateChange(newTemplate, setSelectedTemplate)
   }
 
   const calculateTotals = () => {
@@ -657,7 +663,7 @@ export function CRMInvoiceGenerator({ clientId, invoiceId }: CRMInvoiceGenerator
         isOpen={showTemplateSelection}
         onClose={() => setShowTemplateSelection(false)}
         currentTemplate={selectedTemplate}
-        onTemplateChange={setSelectedTemplate}
+        onTemplateChange={onTemplateChange}
       />
     </div>
   )

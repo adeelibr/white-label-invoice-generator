@@ -2,7 +2,7 @@
  * Theme utilities for consistent theme handling across components
  */
 
-import { getTheme, getDefaultTheme, saveTheme, type ThemeConfig } from "@/lib/storage"
+import { getTheme, getDefaultTheme, saveTheme, getTemplate, getDefaultTemplate, saveTemplate, type ThemeConfig, type TemplateType } from "@/lib/storage"
 
 export interface ThemeClasses {
   primary: string
@@ -83,4 +83,20 @@ export function handleThemeChange(newTheme: ThemeConfig, setTheme: (theme: Theme
 export function initializeTheme(): ThemeConfig {
   const savedTheme = getTheme()
   return savedTheme || getDefaultTheme()
+}
+
+/**
+ * Handle template changes and persistence
+ */
+export function handleTemplateChange(newTemplate: TemplateType, setTemplate: (template: TemplateType) => void): void {
+  setTemplate(newTemplate)
+  saveTemplate(newTemplate)
+}
+
+/**
+ * Initialize template from storage
+ */
+export function initializeTemplate(): TemplateType {
+  const savedTemplate = getTemplate()
+  return savedTemplate || getDefaultTemplate()
 }

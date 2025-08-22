@@ -31,13 +31,14 @@ import {
   searchClients, 
   getClientInvoiceCount,
   saveClientInvoice,
+  getTheme,
+  getDefaultTheme,
   type Client,
   type InvoiceData
 } from "@/lib/storage"
 import {
   getThemeClasses,
   handleThemeChange,
-  initializeTheme,
   getEmptyClientForm,
   populateClientForm,
   saveNewClient,
@@ -55,7 +56,7 @@ export function ClientsDirectory() {
   const [editingClient, setEditingClient] = useState<Client | null>(null)
   
   // Theme states
-  const [theme, setTheme] = useState<ThemeConfig>(initializeTheme())
+  const [theme, setTheme] = useState<ThemeConfig>(getDefaultTheme())
   const [showThemeSettings, setShowThemeSettings] = useState(false)
   const [showTemplateSelection, setShowTemplateSelection] = useState(false)
   
@@ -73,6 +74,13 @@ export function ClientsDirectory() {
       setClients(getAllClients())
     }
   }, [searchQuery])
+
+  useEffect(() => {
+    const savedTheme = getTheme()
+    if (savedTheme) {
+      setTheme(savedTheme)
+    }
+  }, [])
 
   // Get theme classes using the utility function
   const themeClasses: ThemeClasses = getThemeClasses(theme)
@@ -125,7 +133,6 @@ export function ClientsDirectory() {
     if (success) {
       loadClients()
     }
-  }
   }
 
   const getClientInvoicesCount = (clientId: string): number => {

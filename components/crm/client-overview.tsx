@@ -32,13 +32,14 @@ import { OnboardingFlow } from "@/components/onboarding-flow"
 import { 
   getClient,
   getClientInvoices,
+  getTheme,
+  getDefaultTheme,
   type Client,
   type ClientInvoice
 } from "@/lib/storage"
 import {
   getThemeClasses,
   handleThemeChange,
-  initializeTheme,
   getEmptyClientForm,
   populateClientForm,
   updateExistingClient,
@@ -58,7 +59,7 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
   const [isLoading, setIsLoading] = useState(true)
   
   // Theme states
-  const [theme, setTheme] = useState<ThemeConfig>(initializeTheme())
+  const [theme, setTheme] = useState<ThemeConfig>(getDefaultTheme())
   const [showThemeSettings, setShowThemeSettings] = useState(false)
   const [showTemplateSelection, setShowTemplateSelection] = useState(false)
   
@@ -89,6 +90,13 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
   useEffect(() => {
     loadClientData()
   }, [loadClientData])
+
+  useEffect(() => {
+    const savedTheme = getTheme()
+    if (savedTheme) {
+      setTheme(savedTheme)
+    }
+  }, [])
 
   // Get theme classes using the utility function
   const themeClasses: ThemeClasses = getThemeClasses(theme)
@@ -125,7 +133,6 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </Badge>
   )
-  }
 
   const getTotalRevenue = () => {
     return invoices

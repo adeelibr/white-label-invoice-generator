@@ -1,0 +1,18 @@
+{
+  "preset": "ts-jest",
+  "testEnvironment": "jsdom",
+  "roots": ["<rootDir>/__tests__"],
+  "testMatch": ["**/__tests__/**/*.test.(ts|tsx)"],
+  "transform": {
+    "^.+\\.(ts|tsx)$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^@/(.*)$": "<rootDir>/$1"
+  },
+  "setupFilesAfterEnv": ["<rootDir>/__tests__/setup.ts"],
+  "collectCoverageFrom": [
+    "lib/utils/**/*.{ts,tsx}",
+    "!lib/utils/**/*.d.ts",
+    "!lib/utils/**/index.ts"
+  ]
+}

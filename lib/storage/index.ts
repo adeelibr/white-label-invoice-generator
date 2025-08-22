@@ -63,3 +63,16 @@ export {
   type Client,
   type ClientInvoice
 } from './clientStorage'
+
+// Client operations with UI feedback
+export {
+  getEmptyClientForm,
+  populateClientForm,
+  validateClientForm,
+  saveNewClient,
+  updateExistingClient,
+  deleteClientWithConfirmation,
+  deleteInvoiceWithConfirmation,
+  getInvoiceStatusBadge,
+  type ClientFormData
+} from './clientOperations'

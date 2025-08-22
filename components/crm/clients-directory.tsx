@@ -28,18 +28,26 @@ import { TemplateSelection } from "@/components/template-selection"
 import { OnboardingFlow } from "@/components/onboarding-flow"
 import { 
   getAllClients, 
-  saveClient, 
-  updateClient, 
-  deleteClient, 
   searchClients, 
   getClientInvoiceCount,
   saveClientInvoice,
+  saveClient,
   getTheme,
   getDefaultTheme,
-  saveTheme,
   type Client,
   type InvoiceData
 } from "@/lib/storage"
+import {
+  getThemeClasses,
+  handleThemeChange,
+  getEmptyClientForm,
+  populateClientForm,
+  saveNewClient,
+  updateExistingClient,
+  deleteClientWithConfirmation,
+  type ClientFormData,
+  type ThemeClasses
+} from "@/lib/utils"
 
 export function ClientsDirectory() {
   const [clients, setClients] = useState<Client[]>([])
@@ -54,14 +62,7 @@ export function ClientsDirectory() {
   const [showTemplateSelection, setShowTemplateSelection] = useState(false)
   
   // Form states
-  const [clientForm, setClientForm] = useState({
-    name: "",
-    company: "",
-    email: "",
-    phone: "",
-    address: "",
-    notes: ""
-  })
+  const [clientForm, setClientForm] = useState<ClientFormData>(getEmptyClientForm())
 
   useEffect(() => {
     loadClients()
@@ -82,62 +83,12 @@ export function ClientsDirectory() {
     }
   }, [])
 
-  const getThemeClasses = () => {
-    const colorSchemes = {
-      "violet-blue": {
-        primary: "from-violet-600 to-blue-600",
-        primaryHover: "from-violet-700 to-blue-700",
-        secondary: "from-violet-50 via-blue-50 to-cyan-50",
-        accent: "violet-500",
-        accentLight: "violet-50",
-        accentBorder: "violet-300",
-        accentText: "violet-600",
-      },
-      "emerald-teal": {
-        primary: "from-emerald-600 to-teal-600",
-        primaryHover: "from-emerald-700 to-teal-700",
-        secondary: "from-emerald-50 via-teal-50 to-cyan-50",
-        accent: "emerald-500",
-        accentLight: "emerald-50",
-        accentBorder: "emerald-300",
-        accentText: "emerald-600",
-      },
-      "rose-pink": {
-        primary: "from-rose-600 to-pink-600",
-        primaryHover: "from-rose-700 to-pink-700",
-        secondary: "from-rose-50 via-pink-50 to-fuchsia-50",
-        accent: "rose-500",
-        accentLight: "rose-50",
-        accentBorder: "rose-300",
-        accentText: "rose-600",
-      },
-      "orange-amber": {
-        primary: "from-orange-600 to-amber-600",
-        primaryHover: "from-orange-700 to-amber-700",
-        secondary: "from-orange-50 via-amber-50 to-yellow-50",
-        accent: "orange-500",
-        accentLight: "orange-50",
-        accentBorder: "orange-300",
-        accentText: "orange-600",
-      },
-      "indigo-purple": {
-        primary: "from-indigo-600 to-purple-600",
-        primaryHover: "from-indigo-700 to-purple-700",
-        secondary: "from-indigo-50 via-purple-50 to-violet-50",
-        accent: "indigo-500",
-        accentLight: "indigo-50",
-        accentBorder: "indigo-300",
-        accentText: "indigo-600",
-      },
-    }
-    return colorSchemes[theme.colorScheme]
-  }
+  // Get theme classes using the utility function
+  const themeClasses: ThemeClasses = getThemeClasses(theme)
 
-  const themeClasses = getThemeClasses()
-
-  const handleThemeChange = (newTheme: ThemeConfig) => {
-    setTheme(newTheme)
-    saveTheme(newTheme)
+  // Theme change handler using utility
+  const onThemeChange = (newTheme: ThemeConfig) => {
+    handleThemeChange(newTheme, setTheme)
   }
 
   const loadClients = () => {
@@ -154,73 +105,34 @@ export function ClientsDirectory() {
   }
 
   const handleSaveClient = async () => {
-    if (!clientForm.name.trim()) {
-      toast.error("Client name is required")
-      return
+    let result
+    if (editingClient) {
+      // Update existing client
+      result = await updateExistingClient(editingClient.id, clientForm)
+    } else {
+      // Create new client
+      result = await saveNewClient(clientForm)
     }
-
-    try {
-      if (editingClient) {
-        // Update existing client
-        const updated = updateClient(editingClient.id, clientForm)
-        if (updated) {
-          toast.success("Client updated successfully")
-        } else {
-          toast.error("Failed to update client")
-        }
-      } else {
-        // Create new client
-        saveClient(clientForm)
-        toast.success("Client added successfully")
-      }
-      
+    
+    if (result.success) {
       // Reset form and close dialog
-      setClientForm({
-        name: "",
-        company: "",
-        email: "",
-        phone: "",
-        address: "",
-        notes: ""
-      })
+      setClientForm(getEmptyClientForm())
       setShowAddClient(false)
       setEditingClient(null)
       loadClients()
-    } catch (error) {
-      console.error("Failed to save client:", error)
-      toast.error("Failed to save client")
     }
   }
 
   const handleEditClient = (client: Client) => {
-    setClientForm({
-      name: client.name,
-      company: client.company || "",
-      email: client.email || "",
-      phone: client.phone || "",
-      address: client.address || "",
-      notes: client.notes || ""
-    })
+    setClientForm(populateClientForm(client))
     setEditingClient(client)
     setShowAddClient(true)
   }
 
   const handleDeleteClient = async (clientId: string) => {
-    if (!confirm("Are you sure you want to delete this client? This will also delete all their invoices.")) {
-      return
-    }
-
-    try {
-      const success = deleteClient(clientId)
-      if (success) {
-        toast.success("Client deleted successfully")
-        loadClients()
-      } else {
-        toast.error("Failed to delete client")
-      }
-    } catch (error) {
-      console.error("Failed to delete client:", error)
-      toast.error("Failed to delete client")
+    const success = await deleteClientWithConfirmation(clientId)
+    if (success) {
+      loadClients()
     }
   }
 
@@ -541,14 +453,7 @@ export function ClientsDirectory() {
         setShowAddClient(open)
         if (!open) {
           setEditingClient(null)
-          setClientForm({
-            name: "",
-            company: "",
-            email: "",
-            phone: "",
-            address: "",
-            notes: ""
-          })
+          setClientForm(getEmptyClientForm())
         }
       }}>
         <DialogContent className="max-w-md">
@@ -642,7 +547,7 @@ export function ClientsDirectory() {
         isOpen={showThemeSettings}
         onClose={() => setShowThemeSettings(false)}
         theme={theme}
-        onThemeChange={handleThemeChange}
+        onThemeChange={onThemeChange}
       />
 
       {/* Template Selection Modal */}

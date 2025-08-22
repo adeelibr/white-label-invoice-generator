@@ -32,14 +32,22 @@ import { OnboardingFlow } from "@/components/onboarding-flow"
 import { 
   getClient,
   getClientInvoices,
-  deleteInvoice,
-  updateClient,
   getTheme,
   getDefaultTheme,
-  saveTheme,
   type Client,
   type ClientInvoice
 } from "@/lib/storage"
+import {
+  getThemeClasses,
+  handleThemeChange,
+  getEmptyClientForm,
+  populateClientForm,
+  updateExistingClient,
+  deleteInvoiceWithConfirmation,
+  getInvoiceStatusBadge,
+  type ClientFormData,
+  type ThemeClasses
+} from "@/lib/utils"
 
 interface ClientOverviewProps {
   clientId: string
@@ -57,14 +65,7 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
   
   // Edit client states
   const [showEditClient, setShowEditClient] = useState(false)
-  const [clientForm, setClientForm] = useState({
-    name: "",
-    company: "",
-    email: "",
-    phone: "",
-    address: "",
-    notes: ""
-  })
+  const [clientForm, setClientForm] = useState<ClientFormData>(getEmptyClientForm())
 
   const loadClientData = useCallback(async () => {
     setIsLoading(true)
@@ -97,132 +98,41 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
     }
   }, [])
 
-  const getThemeClasses = () => {
-    const colorSchemes = {
-      "violet-blue": {
-        primary: "from-violet-600 to-blue-600",
-        primaryHover: "from-violet-700 to-blue-700",
-        secondary: "from-violet-50 via-blue-50 to-cyan-50",
-        accent: "violet-500",
-        accentLight: "violet-50",
-        accentBorder: "violet-300",
-        accentText: "violet-600",
-      },
-      "emerald-teal": {
-        primary: "from-emerald-600 to-teal-600",
-        primaryHover: "from-emerald-700 to-teal-700",
-        secondary: "from-emerald-50 via-teal-50 to-cyan-50",
-        accent: "emerald-500",
-        accentLight: "emerald-50",
-        accentBorder: "emerald-300",
-        accentText: "emerald-600",
-      },
-      "rose-pink": {
-        primary: "from-rose-600 to-pink-600",
-        primaryHover: "from-rose-700 to-pink-700",
-        secondary: "from-rose-50 via-pink-50 to-fuchsia-50",
-        accent: "rose-500",
-        accentLight: "rose-50",
-        accentBorder: "rose-300",
-        accentText: "rose-600",
-      },
-      "orange-amber": {
-        primary: "from-orange-600 to-amber-600",
-        primaryHover: "from-orange-700 to-amber-700",
-        secondary: "from-orange-50 via-amber-50 to-yellow-50",
-        accent: "orange-500",
-        accentLight: "orange-50",
-        accentBorder: "orange-300",
-        accentText: "orange-600",
-      },
-      "indigo-purple": {
-        primary: "from-indigo-600 to-purple-600",
-        primaryHover: "from-indigo-700 to-purple-700",
-        secondary: "from-indigo-50 via-purple-50 to-violet-50",
-        accent: "indigo-500",
-        accentLight: "indigo-50",
-        accentBorder: "indigo-300",
-        accentText: "indigo-600",
-      },
-    }
-    return colorSchemes[theme.colorScheme]
-  }
+  // Get theme classes using the utility function
+  const themeClasses: ThemeClasses = getThemeClasses(theme)
 
-  const themeClasses = getThemeClasses()
-
-  const handleThemeChange = (newTheme: ThemeConfig) => {
-    setTheme(newTheme)
-    saveTheme(newTheme)
+  // Theme change handler using utility
+  const onThemeChange = (newTheme: ThemeConfig) => {
+    handleThemeChange(newTheme, setTheme)
   }
 
   const handleEditClient = () => {
     if (!client) return
     
-    setClientForm({
-      name: client.name,
-      company: client.company || "",
-      email: client.email || "",
-      phone: client.phone || "",
-      address: client.address || "",
-      notes: client.notes || ""
-    })
+    setClientForm(populateClientForm(client))
     setShowEditClient(true)
   }
 
   const handleSaveClient = async () => {
-    if (!clientForm.name.trim()) {
-      toast.error("Client name is required")
-      return
-    }
-
-    try {
-      const updated = updateClient(clientId, clientForm)
-      if (updated) {
-        toast.success("Client updated successfully")
-        setShowEditClient(false)
-        loadClientData() // Reload the client data to reflect changes
-      } else {
-        toast.error("Failed to update client")
-      }
-    } catch (error) {
-      console.error("Failed to update client:", error)
-      toast.error("Failed to update client")
+    const result = await updateExistingClient(clientId, clientForm)
+    if (result.success) {
+      setShowEditClient(false)
+      loadClientData() // Reload the client data to reflect changes
     }
   }
 
   const handleDeleteInvoice = async (invoiceId: string) => {
-    if (!confirm("Are you sure you want to delete this invoice?")) {
-      return
-    }
-
-    try {
-      const success = deleteInvoice(invoiceId)
-      if (success) {
-        toast.success("Invoice deleted successfully")
-        loadClientData()
-      } else {
-        toast.error("Failed to delete invoice")
-      }
-    } catch (error) {
-      console.error("Failed to delete invoice:", error)
-      toast.error("Failed to delete invoice")
+    const success = await deleteInvoiceWithConfirmation(invoiceId)
+    if (success) {
+      loadClientData()
     }
   }
 
-  const getStatusBadge = (status: string) => {
-    const colors = {
-      draft: "bg-gray-100 text-gray-800",
-      sent: "bg-blue-100 text-blue-800", 
-      paid: "bg-green-100 text-green-800",
-      overdue: "bg-red-100 text-red-800"
-    } as const
-
-    return (
-      <Badge className={colors[status as keyof typeof colors] || colors.draft}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </Badge>
-    )
-  }
+  const getStatusBadge = (status: string) => (
+    <Badge className={getInvoiceStatusBadge(status)}>
+      {status.charAt(0).toUpperCase() + status.slice(1)}
+    </Badge>
+  )
 
   const getTotalRevenue = () => {
     return invoices
@@ -494,7 +404,7 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
         isOpen={showThemeSettings}
         onClose={() => setShowThemeSettings(false)}
         theme={theme}
-        onThemeChange={handleThemeChange}
+        onThemeChange={onThemeChange}
       />
 
       {/* Template Selection Modal */}

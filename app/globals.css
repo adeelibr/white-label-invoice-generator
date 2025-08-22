@@ -204,4 +204,24 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+  
+  /* Premium glass effects for dark theme */
+  .glass-dark {
+    background: rgba(13, 20, 18, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(225, 252, 2, 0.1);
+  }
+  
+  .glass-dark-hover:hover {
+    background: rgba(13, 20, 18, 0.9);
+    border-color: rgba(225, 252, 2, 0.2);
+  }
+  
+  .glow-lime {
+    box-shadow: 0 0 20px rgba(225, 252, 2, 0.1);
+  }
+  
+  .glow-lime-hover:hover {
+    box-shadow: 0 0 30px rgba(225, 252, 2, 0.2);
+  }
 }

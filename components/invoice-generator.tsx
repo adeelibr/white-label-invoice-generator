@@ -19,6 +19,7 @@ import { HeroSection } from "./hero-section"
 import type { TemplateType } from "./templates"
 import { useSoundEffects } from "@/lib/sounds"
 import { useTheme, useInvoice } from "@/lib/hooks"
+import { motion } from "framer-motion"
 
 export function InvoiceGenerator() {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -302,17 +303,36 @@ export function InvoiceGenerator() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Invoice Form */}
           <div id="invoice-form-section" className="space-y-6">
-            <Card className="border-0 shadow-xl bg-white/70 backdrop-blur-sm">
-              <CardHeader className={`bg-gradient-to-r from- bg-transparent${themeClasses.accent}/10 to-blue-500/10 rounded-t-lg`}>
-                <CardTitle className="text-xl font-bold text-slate-800 flex items-center space-x-2">
-                  <div className={`w-2 h-2 bg-${themeClasses.accent} rounded-full`}></div>
-                  <span>Invoice Details</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6 p-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card className={`border-0 shadow-xl transition-all duration-300 hover:shadow-2xl ${theme.colorScheme === 'premium-dark' 
+                ? 'bg-card/80 backdrop-blur-lg border border-border/20 hover:border-border/40' 
+                : 'bg-white/70 backdrop-blur-sm'}`}>
+                <CardHeader className={`${theme.colorScheme === 'premium-dark' 
+                  ? 'bg-gradient-to-r from-accent/5 to-accent/10' 
+                  : `bg-gradient-to-r from-${themeClasses.accent}/10 to-blue-500/10`} rounded-t-lg`}>
+                  <CardTitle className={`text-xl font-bold ${theme.colorScheme === 'premium-dark' 
+                    ? 'text-foreground' 
+                    : 'text-slate-800'} flex items-center space-x-2`}>
+                    <motion.div 
+                      className={`w-2 h-2 ${theme.colorScheme === 'premium-dark' 
+                        ? 'bg-accent' 
+                        : `bg-${themeClasses.accent}`} rounded-full`}
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    ></motion.div>
+                    <span>Invoice Details</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6 p-6">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="invoiceNumber" className="text-slate-700 font-medium">
+                    <Label htmlFor="invoiceNumber" className={`font-medium ${theme.colorScheme === 'premium-dark' 
+                      ? 'text-foreground' 
+                      : 'text-slate-700'}`}>
                       Invoice number
                     </Label>
                     <Input
@@ -320,11 +340,15 @@ export function InvoiceGenerator() {
                       value={invoiceData.invoiceNumber}
                       onChange={(e) => setInvoiceData((prev) => ({ ...prev, invoiceNumber: e.target.value }))}
                       placeholder="INV-001"
-                      className={`border-slate-200 focus:border-${themeClasses.accentText.split("-")[0]}-400 focus:ring-${themeClasses.accentText.split("-")[0]}-400`}
+                      className={theme.colorScheme === 'premium-dark' 
+                        ? 'bg-input border-border/30 focus:border-accent text-foreground placeholder:text-muted-foreground'
+                        : `border-slate-200 focus:border-${themeClasses.accentText.split("-")[0]}-400 focus:ring-${themeClasses.accentText.split("-")[0]}-400`}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="purchaseOrder" className="text-slate-700 font-medium">
+                    <Label htmlFor="purchaseOrder" className={`font-medium ${theme.colorScheme === 'premium-dark' 
+                      ? 'text-foreground' 
+                      : 'text-slate-700'}`}>
                       Purchase order
                     </Label>
                     <Input
@@ -332,7 +356,9 @@ export function InvoiceGenerator() {
                       value={invoiceData.purchaseOrder}
                       onChange={(e) => setInvoiceData((prev) => ({ ...prev, purchaseOrder: e.target.value }))}
                       placeholder="PO-001"
-                      className={`border-slate-200 focus:border-${themeClasses.accentText.split("-")[0]}-400 focus:ring-${themeClasses.accentText.split("-")[0]}-400`}
+                      className={theme.colorScheme === 'premium-dark' 
+                        ? 'bg-input border-border/30 focus:border-accent text-foreground placeholder:text-muted-foreground'
+                        : `border-slate-200 focus:border-${themeClasses.accentText.split("-")[0]}-400 focus:ring-${themeClasses.accentText.split("-")[0]}-400`}
                     />
                   </div>
                 </div>
@@ -470,15 +496,33 @@ export function InvoiceGenerator() {
                 </div>
               </CardContent>
             </Card>
+            </motion.div>
 
-            <Card className="border-0 shadow-xl bg-white/70 backdrop-blur-sm">
-              <CardHeader className={`bg-gradient-to-r from- bg-transparent${themeClasses.accent}/10 to-blue-500/10 rounded-t-lg`}>
-                <CardTitle className="text-xl font-bold text-slate-800 flex items-center space-x-2">
-                  <div className={`w-2 h-2 bg-${themeClasses.accent} rounded-full`}></div>
-                  <span>Line Items</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <Card className={`border-0 shadow-xl transition-all duration-300 hover:shadow-2xl ${theme.colorScheme === 'premium-dark' 
+                ? 'bg-card/80 backdrop-blur-lg border border-border/20 hover:border-border/40' 
+                : 'bg-white/70 backdrop-blur-sm'}`}>
+                <CardHeader className={`${theme.colorScheme === 'premium-dark' 
+                  ? 'bg-gradient-to-r from-accent/5 to-accent/10' 
+                  : `bg-gradient-to-r from-${themeClasses.accent}/10 to-blue-500/10`} rounded-t-lg`}>
+                  <CardTitle className={`text-xl font-bold ${theme.colorScheme === 'premium-dark' 
+                    ? 'text-foreground' 
+                    : 'text-slate-800'} flex items-center space-x-2`}>
+                    <motion.div 
+                      className={`w-2 h-2 ${theme.colorScheme === 'premium-dark' 
+                        ? 'bg-accent' 
+                        : `bg-${themeClasses.accent}`} rounded-full`}
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+                    ></motion.div>
+                    <span>Line Items</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
                 <div className="space-y-4">
                   <div className="grid grid-cols-12 gap-2 text-sm font-medium text-slate-600">
                     <div className="col-span-5">Item description</div>
@@ -549,6 +593,7 @@ export function InvoiceGenerator() {
                 </div>
               </CardContent>
             </Card>
+            </motion.div>
 
             <Card className="border-0 shadow-xl bg-white/70 backdrop-blur-sm">
               <CardHeader className={`bg-gradient-to-r from- bg-transparent${themeClasses.accent}/10 to-blue-500/10 rounded-t-lg`}>

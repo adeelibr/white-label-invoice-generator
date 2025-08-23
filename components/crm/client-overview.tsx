@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { 
   ArrowLeft, 
   Plus, 
@@ -29,6 +30,7 @@ import { ThemeSettings } from "@/components/theme-settings"
 import { TemplateSelection } from "@/components/template-selection"
 import { OnboardingFlow } from "@/components/onboarding-flow"
 import { deleteInvoiceWithConfirmation, getInvoiceStatusBadge } from "@/lib/utils"
+import { updateClientInvoice } from "@/lib/storage/clientStorage"
 import { useTheme, useClient, useTypedModal } from "@/lib/hooks"
 
 interface ClientOverviewProps {
@@ -77,6 +79,14 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
   const handleDeleteInvoice = async (invoiceId: string) => {
     const success = await deleteInvoiceWithConfirmation(invoiceId)
     if (success) {
+      // Reload client data to reflect changes
+      loadClient(clientId)
+    }
+  }
+
+  const handleStatusChange = async (invoiceId: string, newStatus: 'draft' | 'sent' | 'paid' | 'overdue') => {
+    const updatedInvoice = updateClientInvoice(invoiceId, { status: newStatus })
+    if (updatedInvoice) {
       // Reload client data to reflect changes
       loadClient(clientId)
     }
@@ -312,7 +322,23 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
                             <h4 className="font-semibold">
                               Invoice #{invoice.invoiceNumber || invoice.id}
                             </h4>
-                            {getStatusBadge(invoice.status)}
+                            <div className="flex items-center space-x-3">
+                              {getStatusBadge(invoice.status)}
+                              <Select 
+                                value={invoice.status} 
+                                onValueChange={(value) => handleStatusChange(invoice.id, value as 'draft' | 'sent' | 'paid' | 'overdue')}
+                              >
+                                <SelectTrigger className="w-[120px] h-8">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="draft">Draft</SelectItem>
+                                  <SelectItem value="sent">Sent</SelectItem>
+                                  <SelectItem value="paid">Paid</SelectItem>
+                                  <SelectItem value="overdue">Overdue</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </div>
                           <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                             <div className="flex items-center">

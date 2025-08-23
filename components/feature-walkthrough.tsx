@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, ArrowRight, Check, X, FileText, Settings, Eye, Download } from "lucide-react"
+import { ArrowLeft, ArrowRight, Check, X, FileText, Settings, Eye, Download, Users } from "lucide-react"
 
 interface FeatureWalkthroughProps {
   onComplete: () => void
@@ -42,6 +42,14 @@ const walkthroughSteps: WalkthroughStep[] = [
     description: "Click here to choose from beautiful themes and templates that match your brand perfectly.",
     icon: <Settings className="h-5 w-5" />,
     highlightSelector: "#customize-button",
+    position: "bottom"
+  },
+  {
+    id: "crm-navigation",
+    title: "Manage Clients with CRM",
+    description: "Need to manage multiple clients? Click 'CRM' in the header to access your client management dashboard where you can store client info and track all their invoices!",
+    icon: <Users className="h-5 w-5" />,
+    highlightSelector: "[href='/crm']",
     position: "bottom"
   },
   {

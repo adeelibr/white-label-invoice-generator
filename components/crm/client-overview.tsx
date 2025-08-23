@@ -322,7 +322,7 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
                             <h4 className="font-semibold">
                               Invoice #{invoice.invoiceNumber || invoice.id}
                             </h4>
-                            <div className="flex items-center space-x-3">
+                            <div className="flex items-center space-x-3" data-tour="invoice-status">
                               {getStatusBadge(invoice.status)}
                               <Select 
                                 value={invoice.status} 

@@ -26,6 +26,7 @@ import { Header } from "@/components/header"
 import { ThemeSettings, type ThemeConfig } from "@/components/theme-settings"
 import { TemplateSelection } from "@/components/template-selection"
 import { OnboardingFlow } from "@/components/onboarding-flow"
+import { CRMOnboardingFlow } from "@/components/crm-onboarding-flow"
 import { 
   getAllClients, 
   searchClients, 
@@ -282,6 +283,9 @@ export function ClientsDirectory() {
       {/* Onboarding Flow */}
       <OnboardingFlow />
       
+      {/* CRM Onboarding Flow */}
+      <CRMOnboardingFlow />
+      
       {/* Enhanced Header */}
       <Header
         theme={theme}
@@ -301,7 +305,7 @@ export function ClientsDirectory() {
                   Back to Home
                 </Button>
               </Link>
-              <div>
+              <div data-tour="crm-header">
                 <h1 className="text-2xl font-bold text-slate-800">Clients & Invoices</h1>
                 <p className="text-slate-600 mt-1">Manage your clients and their invoices</p>
               </div>
@@ -311,11 +315,12 @@ export function ClientsDirectory() {
                 onClick={generateDummyData}
                 variant="outline"
                 className="text-muted-foreground hover:text-foreground"
+                data-tour="generate-demo"
               >
                 <Database className="h-4 w-4 mr-2" />
                 Generate Demo Data
               </Button>
-              <Button onClick={() => setShowAddClient(true)} className={`shadow-md bg-gradient-to-r ${themeClasses.primary} hover:${themeClasses.primaryHover} text-white`}>
+              <Button onClick={() => setShowAddClient(true)} className={`shadow-md bg-gradient-to-r ${themeClasses.primary} hover:${themeClasses.primaryHover} text-white`} data-tour="add-client">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Client
               </Button>
@@ -377,6 +382,7 @@ export function ClientsDirectory() {
                 <Card 
                   key={client.id} 
                   className="hover:shadow-lg transition-all duration-200 border-0 shadow-md bg-gradient-to-br from-white to-slate-50/50 group"
+                  data-tour="client-card"
                 >
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">

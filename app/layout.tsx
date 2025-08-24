@@ -153,7 +153,7 @@ export default function RootLayout({
       className={`${playfair.variable} ${sourceSans.variable} ${inter.variable} ${openSans.variable} ${crimsonText.variable} ${spaceGrotesk.variable} ${poppins.variable} ${nunito.variable} antialiased`}
     >
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <meta name="format-detection" content="telephone=no" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

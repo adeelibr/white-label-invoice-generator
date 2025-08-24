@@ -155,27 +155,34 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
       {/* Client Page Header */}
       <div className="bg-white/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-6">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-4 sm:py-6 gap-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <Link href="/crm">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Clients
+                <Button variant="ghost" size="sm" className="px-2 sm:px-3">
+                  <ArrowLeft className="h-4 w-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Back to Clients</span>
+                  <span className="sm:hidden">Back</span>
                 </Button>
               </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-800">{client.name}</h1>
-                <p className="text-slate-600 mt-1">
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl font-bold text-slate-800 leading-tight truncate">{client.name}</h1>
+                <p className="text-sm text-slate-600 mt-1 truncate">
                   {client.company ? client.company : 'Client Details'}
                 </p>
               </div>
             </div>
-            <Link href={`/crm/clients/${clientId}/invoices/new`}>
-              <Button className={`shadow-md bg-gradient-to-r ${themeClasses.primary} hover:${themeClasses.primaryHover} text-white`}>
-                <Plus className="h-4 w-4 mr-2" />
-                New Invoice
-              </Button>
-            </Link>
+            <div className="flex-shrink-0">
+              <Link href={`/crm/clients/${clientId}/invoices/new`}>
+                <Button 
+                  className={`shadow-md bg-gradient-to-r ${themeClasses.primary} hover:${themeClasses.primaryHover} text-white px-3 sm:px-4`}
+                  size="sm"
+                >
+                  <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">New Invoice</span>
+                  <span className="sm:hidden">New</span>
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>

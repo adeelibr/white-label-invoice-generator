@@ -297,32 +297,41 @@ export function ClientsDirectory() {
       {/* CRM Page Header */}
       <div className="bg-white/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-6">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-4 sm:py-6 gap-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <Link href="/">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Home
+                <Button variant="ghost" size="sm" className="px-2 sm:px-3">
+                  <ArrowLeft className="h-4 w-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Back to Home</span>
+                  <span className="sm:hidden">Back</span>
                 </Button>
               </Link>
-              <div data-tour="crm-header">
-                <h1 className="text-2xl font-bold text-slate-800">Clients & Invoices</h1>
-                <p className="text-slate-600 mt-1">Manage your clients and their invoices</p>
+              <div data-tour="crm-header" className="min-w-0">
+                <h1 className="text-xl sm:text-2xl font-bold text-slate-800 leading-tight">Clients & Invoices</h1>
+                <p className="text-sm text-slate-600 mt-1 hidden sm:block">Manage your clients and their invoices</p>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
               <Button 
                 onClick={generateDummyData}
                 variant="outline"
-                className="text-muted-foreground hover:text-foreground"
+                size="sm"
+                className="text-muted-foreground hover:text-foreground px-2 sm:px-3"
                 data-tour="generate-demo"
               >
-                <Database className="h-4 w-4 mr-2" />
-                Generate Demo Data
+                <Database className="h-4 w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Generate Demo Data</span>
+                <span className="sm:hidden">Demo</span>
               </Button>
-              <Button onClick={() => setShowAddClient(true)} className={`shadow-md bg-gradient-to-r ${themeClasses.primary} hover:${themeClasses.primaryHover} text-white`} data-tour="add-client">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Client
+              <Button 
+                onClick={() => setShowAddClient(true)} 
+                className={`shadow-md bg-gradient-to-r ${themeClasses.primary} hover:${themeClasses.primaryHover} text-white px-3 sm:px-4`} 
+                data-tour="add-client"
+                size="sm"
+              >
+                <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Add Client</span>
+                <span className="sm:hidden">Add</span>
               </Button>
             </div>
           </div>

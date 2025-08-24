@@ -155,26 +155,26 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
       {/* Client Page Header */}
       <div className="bg-white/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-4 sm:py-6 gap-4">
-            <div className="flex items-center space-x-2 sm:space-x-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 sm:py-6 gap-3 sm:gap-4">
+            <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
               <Link href="/crm">
-                <Button variant="ghost" size="sm" className="px-2 sm:px-3">
+                <Button variant="ghost" size="sm" className="px-2 sm:px-3 flex-shrink-0">
                   <ArrowLeft className="h-4 w-4 mr-1 sm:mr-2" />
                   <span className="hidden sm:inline">Back to Clients</span>
                   <span className="sm:hidden">Back</span>
                 </Button>
               </Link>
-              <div className="min-w-0">
-                <h1 className="text-xl sm:text-2xl font-bold text-slate-800 leading-tight truncate">{client.name}</h1>
-                <p className="text-sm text-slate-600 mt-1 truncate">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 leading-tight truncate">{client.name}</h1>
+                <p className="text-xs sm:text-sm text-slate-600 mt-1 truncate">
                   {client.company ? client.company : 'Client Details'}
                 </p>
               </div>
             </div>
-            <div className="flex-shrink-0">
-              <Link href={`/crm/clients/${clientId}/invoices/new`}>
+            <div className="flex-shrink-0 w-full sm:w-auto">
+              <Link href={`/crm/clients/${clientId}/invoices/new`} className="block w-full sm:w-auto">
                 <Button 
-                  className={`shadow-md bg-gradient-to-r ${themeClasses.primary} hover:${themeClasses.primaryHover} text-white px-3 sm:px-4`}
+                  className={`w-full sm:w-auto shadow-md bg-gradient-to-r ${themeClasses.primary} hover:${themeClasses.primaryHover} text-white px-3 sm:px-4`}
                   size="sm"
                 >
                   <Plus className="h-4 w-4 mr-1 sm:mr-2" />
@@ -323,61 +323,116 @@ export function ClientOverview({ clientId }: ClientOverviewProps) {
                 ) : (
                   <div className="space-y-4">
                     {invoices.map((invoice) => (
-                      <div key={invoice.id} className="flex items-center justify-between p-4 border border-border rounded-lg bg-white/50">
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-semibold">
-                              Invoice #{invoice.invoiceNumber || invoice.id}
-                            </h4>
-                            <div className="flex items-center space-x-3" data-tour="invoice-status">
+                      <div key={invoice.id} className="p-3 sm:p-4 border border-border rounded-lg bg-white/50">
+                        {/* Mobile Layout */}
+                        <div className="block sm:hidden">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="min-w-0 flex-1 mr-2">
+                              <h4 className="font-semibold text-sm truncate">
+                                Invoice #{invoice.invoiceNumber || invoice.id}
+                              </h4>
+                              <div className="flex items-center mt-1 text-xs text-muted-foreground">
+                                <Calendar className="h-3 w-3 mr-1" />
+                                {format(new Date(invoice.date), 'MMM d')}
+                                <span className="mx-2">•</span>
+                                <DollarSign className="h-3 w-3 mr-1" />
+                                {invoice.currency} {invoice.total.toFixed(2)}
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-1" data-tour="invoice-status">
                               {getStatusBadge(invoice.status)}
-                              <Select 
-                                value={invoice.status} 
-                                onValueChange={(value) => handleStatusChange(invoice.id, value as 'draft' | 'sent' | 'paid' | 'overdue')}
-                              >
-                                <SelectTrigger className="w-[120px] h-8">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="draft">Draft</SelectItem>
-                                  <SelectItem value="sent">Sent</SelectItem>
-                                  <SelectItem value="paid">Paid</SelectItem>
-                                  <SelectItem value="overdue">Overdue</SelectItem>
-                                </SelectContent>
-                              </Select>
                             </div>
                           </div>
-                          <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                            <div className="flex items-center">
-                              <Calendar className="h-3 w-3 mr-1" />
-                              {format(new Date(invoice.date), 'MMM d, yyyy')}
-                            </div>
-                            {invoice.dueDate && (
-                              <div className="flex items-center">
-                                <Calendar className="h-3 w-3 mr-1" />
-                                Due: {format(new Date(invoice.dueDate), 'MMM d, yyyy')}
-                              </div>
-                            )}
-                            <div className="flex items-center">
-                              <DollarSign className="h-3 w-3 mr-1" />
-                              {invoice.currency} {invoice.total.toFixed(2)}
+                          <div className="flex items-center justify-between">
+                            <Select 
+                              value={invoice.status} 
+                              onValueChange={(value) => handleStatusChange(invoice.id, value as 'draft' | 'sent' | 'paid' | 'overdue')}
+                            >
+                              <SelectTrigger className="w-24 h-8 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="draft">Draft</SelectItem>
+                                <SelectItem value="sent">Sent</SelectItem>
+                                <SelectItem value="paid">Paid</SelectItem>
+                                <SelectItem value="overdue">Overdue</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <div className="flex items-center space-x-1">
+                              <Link href={`/crm/clients/${clientId}/invoices/${invoice.id}`}>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </Link>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 text-red-500 hover:text-red-600"
+                                onClick={() => handleDeleteInvoice(invoice.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <Link href={`/crm/clients/${clientId}/invoices/${invoice.id}`}>
-                            <Button variant="ghost" size="sm">
-                              <Eye className="h-4 w-4" />
+
+                        {/* Desktop Layout */}
+                        <div className="hidden sm:flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-semibold">
+                                Invoice #{invoice.invoiceNumber || invoice.id}
+                              </h4>
+                              <div className="flex items-center space-x-3" data-tour="invoice-status">
+                                {getStatusBadge(invoice.status)}
+                                <Select 
+                                  value={invoice.status} 
+                                  onValueChange={(value) => handleStatusChange(invoice.id, value as 'draft' | 'sent' | 'paid' | 'overdue')}
+                                >
+                                  <SelectTrigger className="w-[120px] h-8">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="draft">Draft</SelectItem>
+                                    <SelectItem value="sent">Sent</SelectItem>
+                                    <SelectItem value="paid">Paid</SelectItem>
+                                    <SelectItem value="overdue">Overdue</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                              <div className="flex items-center">
+                                <Calendar className="h-3 w-3 mr-1" />
+                                {format(new Date(invoice.date), 'MMM d, yyyy')}
+                              </div>
+                              {invoice.dueDate && (
+                                <div className="flex items-center">
+                                  <Calendar className="h-3 w-3 mr-1" />
+                                  Due: {format(new Date(invoice.dueDate), 'MMM d, yyyy')}
+                                </div>
+                              )}
+                              <div className="flex items-center">
+                                <DollarSign className="h-3 w-3 mr-1" />
+                                {invoice.currency} {invoice.total.toFixed(2)}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2 ml-4">
+                            <Link href={`/crm/clients/${clientId}/invoices/${invoice.id}`}>
+                              <Button variant="ghost" size="sm">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-500 hover:text-red-600"
+                              onClick={() => handleDeleteInvoice(invoice.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
                             </Button>
-                          </Link>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-500 hover:text-red-600"
-                            onClick={() => handleDeleteInvoice(invoice.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          </div>
                         </div>
                       </div>
                     ))}

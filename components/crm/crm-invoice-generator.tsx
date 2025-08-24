@@ -359,29 +359,31 @@ export function CRMInvoiceGenerator({ clientId, invoiceId }: CRMInvoiceGenerator
       {/* Invoice Page Header */}
       <div className="bg-white/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-6">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 sm:py-6 gap-3 sm:gap-4">
+            <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
               <Link href={`/crm/clients/${clientId}`}>
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to {client.name}
+                <Button variant="ghost" size="sm" className="px-2 sm:px-3 flex-shrink-0">
+                  <ArrowLeft className="h-4 w-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Back to {client.name}</span>
+                  <span className="sm:hidden">Back</span>
                 </Button>
               </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-800">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 truncate">
                   {invoiceId ? 'Edit Invoice' : 'New Invoice'}
                 </h1>
-                <p className="text-slate-600 mt-1">
+                <p className="text-xs sm:text-sm text-slate-600 mt-1 truncate">
                   for {client.name}
                 </p>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto">
               {!showPreview && (
                 <Button
                   variant="outline"
                   onClick={() => setShowPreview(true)}
                   className="hidden lg:flex"
+                  size="sm"
                 >
                   <Eye className="h-4 w-4 mr-2" />
                   Preview
@@ -391,16 +393,21 @@ export function CRMInvoiceGenerator({ clientId, invoiceId }: CRMInvoiceGenerator
                 onClick={handleSaveInvoice}
                 disabled={isSaving}
                 variant="outline"
+                size="sm"
+                className="flex-1 sm:flex-initial"
               >
-                <Save className="h-4 w-4 mr-2" />
-                {isSaving ? 'Saving...' : 'Save'}
+                <Save className="h-4 w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">{isSaving ? 'Saving...' : 'Save'}</span>
+                <span className="sm:hidden">{isSaving ? 'Saving' : 'Save'}</span>
               </Button>
               <Button 
                 onClick={handleCreatePDF}
-                className={`bg-gradient-to-r ${themeClasses.primary} hover:${themeClasses.primaryHover} text-white shadow-lg`}
+                className={`flex-1 sm:flex-initial bg-gradient-to-r ${themeClasses.primary} hover:${themeClasses.primaryHover} text-white shadow-lg`}
+                size="sm"
               >
-                <Download className="h-4 w-4 mr-2" />
-                Download PDF
+                <Download className="h-4 w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Download PDF</span>
+                <span className="sm:hidden">PDF</span>
               </Button>
             </div>
           </div>

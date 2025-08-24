@@ -99,6 +99,90 @@ export function clearShowOnboardingAgain(): void {
   }
 }
 
+// CRM-specific onboarding functions
+const CRM_ONBOARDING_STORAGE_KEY = "invoice-generator-crm-onboarding-completed"
+const CRM_ONBOARDING_SHOW_AGAIN_KEY = "invoice-generator-show-crm-onboarding-again"
+
+/**
+ * Save CRM onboarding completion state
+ */
+export function saveCRMOnboardingCompleted(): void {
+  if (!isBrowser()) {
+    console.warn("saveCRMOnboardingCompleted: localStorage not available")
+    return
+  }
+
+  try {
+    localStorage.setItem(CRM_ONBOARDING_STORAGE_KEY, "true")
+  } catch (error) {
+    console.error("Failed to save CRM onboarding state:", error)
+  }
+}
+
+/**
+ * Check if user has completed CRM onboarding
+ */
+export function hasCompletedCRMOnboarding(): boolean {
+  if (!isBrowser()) {
+    return false
+  }
+
+  try {
+    return localStorage.getItem(CRM_ONBOARDING_STORAGE_KEY) === "true"
+  } catch (error) {
+    console.error("Failed to check CRM onboarding state:", error)
+    return false
+  }
+}
+
+/**
+ * Set flag to show CRM onboarding again
+ */
+export function setShowCRMOnboardingAgain(): void {
+  if (!isBrowser()) {
+    console.warn("setShowCRMOnboardingAgain: localStorage not available")
+    return
+  }
+
+  try {
+    localStorage.setItem(CRM_ONBOARDING_SHOW_AGAIN_KEY, "true")
+  } catch (error) {
+    console.error("Failed to set show CRM onboarding again flag:", error)
+  }
+}
+
+/**
+ * Check if CRM onboarding should be shown again
+ */
+export function shouldShowCRMOnboardingAgain(): boolean {
+  if (!isBrowser()) {
+    return false
+  }
+
+  try {
+    return localStorage.getItem(CRM_ONBOARDING_SHOW_AGAIN_KEY) === "true"
+  } catch (error) {
+    console.error("Failed to check show CRM onboarding again flag:", error)
+    return false
+  }
+}
+
+/**
+ * Clear the "show CRM onboarding again" flag
+ */
+export function clearShowCRMOnboardingAgain(): void {
+  if (!isBrowser()) {
+    console.warn("clearShowCRMOnboardingAgain: localStorage not available")
+    return
+  }
+
+  try {
+    localStorage.removeItem(CRM_ONBOARDING_SHOW_AGAIN_KEY)
+  } catch (error) {
+    console.error("Failed to clear show CRM onboarding again flag:", error)
+  }
+}
+
 /**
  * Reset all onboarding state (for development/testing)
  */
